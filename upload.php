@@ -1,6 +1,7 @@
 <?php
 include 'db.php';
 header('Content-Type: application/json');
+
 if (isset($_FILES['spreadsheet'])) {
     require 'vendor/autoload.php';  // Load necessary libraries
 
@@ -30,6 +31,12 @@ if (isset($_FILES['spreadsheet'])) {
         $latitude = $coordinates['lat'];
         $longitude = $coordinates['lng'];
 
+        // Check if coordinates are valid (not 0, 0)
+        if ($latitude == 0 && $longitude == 0) {
+            error_log("Skipping entry for $address: Invalid coordinates.");
+            continue; // Skip this entry
+        }
+
         // Prepare and execute the SQL statement
         $stmt = $conn->prepare("INSERT INTO deliveries 
             (street_number, street_name, suburb, city, postcode, phone_number, order_id, delivery_id, latitude, longitude) 
@@ -37,10 +44,17 @@ if (isset($_FILES['spreadsheet'])) {
         );
         if ($stmt) {
             $stmt->bind_param("isssssssdd", $number, $street_name, $suburb, $city, $postcode, $phone, $order_id, $delivery_id, $latitude, $longitude);
-            $stmt->execute();
+            if (!$stmt->execute()) {
+                error_log("SQL Error for delivery_id $delivery_id: " . $stmt->error); // Log the SQL error
+                echo json_encode(['error' => 'Database query failed: ' . $stmt->error]);
+                $stmt->close();
+                continue; // Skip to the next entry
+            }
             $stmt->close();
         } else {
-            die(json_encode(['error' => 'Database query failed: ' . $conn->error]));
+            error_log("Database query preparation failed: " . $conn->error); // Log preparation error
+            echo json_encode(['error' => 'Database query preparation failed: ' . $conn->error]);
+            continue; // Skip to the next entry
         }
     }
 
@@ -79,4 +93,3 @@ function getCoordinates($address) {
     // Return default coordinates if API fails or no result
     return ['lat' => 0, 'lng' => 0];
 }
-?>
