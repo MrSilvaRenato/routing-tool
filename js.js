@@ -38,9 +38,10 @@ function loadMapMarkers() {
                 if (location.latitude && location.longitude) {
                     var marker = L.marker([location.latitude, location.longitude]).addTo(map);
 
-                    // Popup content with drop number input field
+                    // Popup content with drop number input field and city
                     var popupContent = `
-                        <strong>Address: ${location.street_number} ${location.street_name}<br>${location.suburb}</strong><br>
+                        <strong>Address: ${location.street_number} ${location.street_name}<br>
+                        ${location.suburb}, ${location.city}</strong><br>
                         <input type="number" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
                         <button onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
                     `;
