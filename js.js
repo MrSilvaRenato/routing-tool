@@ -30,10 +30,10 @@ function loadMapMarkers() {
 
                 // Popup content with drop number input field
                 var popupContent = `
-                    <strong>Address: ${location.street_number} ${location.street_name}<br>${location.suburb}</strong><br>
-                    <input type="number" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
-                    <button onclick="assignDrop('${location.delivery_id}')">Assign Drop</button> <!-- Use quotes for delivery_id -->
-                `;
+                <strong>Address: ${location.street_number} ${location.street_name}, ${location.suburb}, ${location.city}</strong><br>
+                <input type="number" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
+                <button onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
+            `;
                 marker.bindPopup(popupContent).openPopup();
 
                 // Show drop number on the marker if assigned
