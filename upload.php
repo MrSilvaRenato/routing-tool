@@ -1,4 +1,5 @@
 <?php
+include 'db.php';
 if (isset($_FILES['spreadsheet'])) {
     require 'vendor/autoload.php';  // Load necessary libraries
 
@@ -8,10 +9,6 @@ if (isset($_FILES['spreadsheet'])) {
     $data = $sheet->toArray();
 
     // Connect to the database
-    $conn = new mysqli('localhost', 'root', '', 'perkii');
-    if ($conn->connect_error) {
-        die(json_encode(['error' => "Connection failed: " . $conn->connect_error]));
-    }
 
     foreach ($data as $row) {
         // Data from spreadsheet

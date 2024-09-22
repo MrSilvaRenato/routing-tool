@@ -1,4 +1,5 @@
 <?php
+include 'db.php';
 if (isset($_POST['delivery_id']) && isset($_POST['drop_number'])) {
     $delivery_id = $_POST['delivery_id']; // Get the delivery_id from the request
     $drop_number = intval($_POST['drop_number']); // Ensure it's an integer
@@ -7,10 +8,7 @@ if (isset($_POST['delivery_id']) && isset($_POST['drop_number'])) {
     error_log("Delivery ID: $delivery_id, Drop Number: $drop_number");
 
     // Database connection
-    $conn = new mysqli('localhost', 'root', '', 'perkii');
-    if ($conn->connect_error) {
-        die(json_encode(['error' => 'Connection failed: ' . $conn->connect_error]));
-    }
+ 
 
     // Prepare the SQL statement
     $stmt = $conn->prepare("UPDATE deliveries SET drop_number = ? WHERE delivery_id = ?");
