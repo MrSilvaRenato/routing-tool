@@ -1,5 +1,6 @@
 <?php
 include 'db.php';
+header('Content-Type: application/json');
 if (isset($_POST['delivery_id']) && isset($_POST['drop_number'])) {
     $delivery_id = $_POST['delivery_id']; // Get the delivery_id from the request
     $drop_number = intval($_POST['drop_number']); // Ensure it's an integer

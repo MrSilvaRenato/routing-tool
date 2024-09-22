@@ -1,5 +1,6 @@
 <?php
 include 'db.php';
+header('Content-Type: application/json');
 if (isset($_FILES['spreadsheet'])) {
     require 'vendor/autoload.php';  // Load necessary libraries
 
