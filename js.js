@@ -15,8 +15,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function loadMapMarkers() {
     fetch('get_deliveries.php') // Fetch deliveries from the server
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
         .then(locations => {
+            if (!Array.isArray(locations)) {
+                throw new Error('Expected an array of locations');
+            }
+
             // Clear existing markers before adding new ones
             map.eachLayer(function(layer) {
                 if (layer instanceof L.Marker) {
@@ -26,33 +35,38 @@ function loadMapMarkers() {
 
             // Add markers to the map
             locations.forEach(location => {
-                var marker = L.marker([location.latitude, location.longitude]).addTo(map);
+                if (location.latitude && location.longitude) {
+                    var marker = L.marker([location.latitude, location.longitude]).addTo(map);
 
-                // Popup content with drop number input field
-                var popupContent = `
-                    <strong>Address: ${location.street_number} ${location.street_name}<br>${location.suburb}</strong><br>
-                    <input type="number" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
-                    <button onclick="assignDrop('${location.delivery_id}')">Assign Drop</button> <!-- Use quotes for delivery_id -->
-                `;
-                marker.bindPopup(popupContent).openPopup();
+                    // Popup content with drop number input field
+                    var popupContent = `
+                        <strong>Address: ${location.street_number} ${location.street_name}<br>${location.suburb}</strong><br>
+                        <input type="number" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
+                        <button onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
+                    `;
+                    marker.bindPopup(popupContent).openPopup();
 
-                // Show drop number on the marker if assigned
-                if (location.drop_number) {
-                    var dropLabel = `${location.drop_number}`;
-                    var dropIcon = L.divIcon({
-                        className: 'drop-icon',
-                        html: `<div style="color: red; font-size: 20px; font-weight: bold; text-align: center;">
-                        ${dropLabel}
-                    </div>`,
-                        iconSize: [30, 42],
-                        popupAnchor: [0, -30]
-                    });
-                    marker.setIcon(dropIcon);
+                    // Show drop number on the marker if assigned
+                    if (location.drop_number) {
+                        var dropLabel = `${location.drop_number}`;
+                        var dropIcon = L.divIcon({
+                            className: 'drop-icon',
+                            html: `<div style="color: red; font-size: 20px; font-weight: bold; text-align: center;">
+                            ${dropLabel}
+                        </div>`,
+                            iconSize: [30, 42],
+                            popupAnchor: [0, -30]
+                        });
+                        marker.setIcon(dropIcon);
+                    }
+                } else {
+                    console.error('Location missing coordinates:', location);
                 }
             });
         })
         .catch(err => console.error('Error fetching locations:', err));
 }
+
 
 // Function to assign a drop number
 function assignDrop(deliveryId) {

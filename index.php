@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delivery Map</title>
   
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" /> <!-- Add Leaflet CSS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
@@ -17,8 +18,6 @@
     <h2>Delivery Map</h2>
     <div id="map" style="height: 500px; width: 100%;"></div>
     
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="js.js"></script>  <!-- External JS file -->
-    
 </body>
 </html>
