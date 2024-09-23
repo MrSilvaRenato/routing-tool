@@ -4,16 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delivery Map</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" /> <!-- Add Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" /> <!-- Leaflet CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> <!-- Bootstrap CSS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script> <!-- jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script> <!-- Popper.js -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> <!-- Bootstrap JS -->
     <style>
-        /* Flexbox for aligning upload form and delete button side by side */
-        #controls {
-            display: flex;
-            gap: 10px; /* Space between upload button and delete button */
-            margin-bottom: 20px;
-        }
-
         #map {
             height: 500px;
             width: 100%;
@@ -22,23 +19,26 @@
     </style>
 </head>
 <body>
-    <h2>Basic routing tool by Renato</h2>
+    <div class="container mt-5">
+        <h2 class="text-center">Basic Routing Tool by Renato</h2>
 
-    <!-- Flexbox container for upload and delete all controls -->
-    <div id="controls">
-    <form id="uploadForm" enctype="multipart/form-data">
-        <input type="file" name="spreadsheet" accept=".xlsx, .xls, .csv" required>
-        <input type="submit" value="Upload">
-    </form>
-    <button type="button" id="deleteAllBtn" onclick="deleteAllRecords()">Delete All</button>
-</div>
-<div id="loadingMessage" style="display:none;">
-    Manifest is getting uploaded, please wait<span id="loadingDots">...</span>
-</div>
-    <div id="message"></div>
+        <div id="controls" class="d-flex justify-content-center my-3">
+            <form id="uploadForm" enctype="multipart/form-data" class="form-inline">
+                <input type="file" name="spreadsheet" accept=".xlsx, .xls, .csv" required class="form-control mb-2 mr-2">
+                <button type="submit" class="btn btn-primary mb-2">Upload</button>
+            </form>
+            <button type="button" id="deleteAllBtn" class="btn btn-danger mb-2" onclick="deleteAllRecords()">Delete All</button>
+        </div>
 
-    <h2>Delivery Map</h2>
-    <div id="map"></div>
+        <div id="loadingMessage" class="alert alert-info" style="display:none;">
+            Manifest is getting uploaded, please wait<span id="loadingDots">...</span>
+        </div>
+
+        <div id="message" class="my-3"></div>
+
+        <h2 class="text-center">Delivery Map</h2>
+        <div id="map"></div>
+    </div>
 
     <script src="js.js"></script>
 </body>
