@@ -19,7 +19,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_single' && isset($_P
     $delivery_id = $_POST['delivery_id'];
 
     $deleteSingleStmt = $conn->prepare("DELETE FROM deliveries WHERE delivery_id = ?");
-    $deleteSingleStmt->bind_param("s", $delivery_id);
+    $deleteSingleStmt->bind_param("s", $delivery_id); // 's' indicates a string type for delivery_id
     if ($deleteSingleStmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Record deleted successfully.']);
     } else {

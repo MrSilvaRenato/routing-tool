@@ -38,12 +38,13 @@ function loadMapMarkers() {
                 if (location.latitude && location.longitude) {
                     var marker = L.marker([location.latitude, location.longitude]).addTo(map);
 
-                    // Popup content with drop number input field and city
+                    // Popup content with drop number input field, assign drop button, and delete record button
                     var popupContent = `
                         <strong>Address: ${location.street_number} ${location.street_name}<br>
                         ${location.suburb}, ${location.city}</strong><br>
                         <input type="number" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
                         <button onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
+                        <button onclick="deleteRecord('${location.delivery_id}')">Delete Record</button>
                     `;
                     marker.bindPopup(popupContent).openPopup();
 
@@ -154,4 +155,3 @@ function deleteRecord(deliveryId) {
         .catch(err => console.error('Error deleting record:', err));
     }
 }
-
