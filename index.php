@@ -14,6 +14,7 @@
         <input type="file" name="spreadsheet" accept=".xlsx, .xls, .csv" required>
         <input type="submit" value="Upload">
     </form>
+    <button id="deleteAllBtn">Delete All
     <div id="message"></div>
     <h2>Delivery Map</h2>
     <div id="map" style="height: 500px; width: 100%;"></div>

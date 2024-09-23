@@ -108,3 +108,50 @@ function assignDrop(deliveryId) {
         alert('Please enter a valid drop number.');
     }
 }
+
+// Function to delete all records
+function deleteAllRecords() {
+    if (confirm('Are you sure you want to delete all records? This action cannot be undone.')) {
+        fetch('update.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=delete_all'
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert('All records deleted successfully.');
+                loadMapMarkers(); // Refresh markers
+            } else {
+                alert('Error deleting records: ' + result.error);
+            }
+        })
+        .catch(err => console.error('Error deleting records:', err));
+    }
+}
+
+// Function to delete individual record
+function deleteRecord(deliveryId) {
+    if (confirm('Are you sure you want to delete this record?')) {
+        fetch('update.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=delete_single&delivery_id=${deliveryId}`
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                alert('Record deleted successfully.');
+                loadMapMarkers(); // Refresh markers
+            } else {
+                alert('Error deleting record: ' + result.error);
+            }
+        })
+        .catch(err => console.error('Error deleting record:', err));
+    }
+}
+
