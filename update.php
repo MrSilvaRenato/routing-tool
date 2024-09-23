@@ -3,7 +3,7 @@ include 'db.php';
 header('Content-Type: application/json');
 
 // Handle Delete All request
-if (isset($_POST['action']) && $_POST['action'] === 'deleteAll') {
+if (isset($_POST['action']) && $_POST['action'] === 'delete_all') {
     $deleteQuery = "DELETE FROM deliveries";
     if ($conn->query($deleteQuery) === TRUE) {
         echo json_encode(['success' => true, 'message' => 'All records deleted successfully']);
