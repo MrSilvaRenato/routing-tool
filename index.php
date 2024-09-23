@@ -37,7 +37,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h2 class="text-center">Basic Routing Tool by Renato</h2>
+        
 
         <div id="controls" class="d-flex justify-content-center my-3">
             <form id="uploadForm" enctype="multipart/form-data" class="form-inline">
@@ -60,7 +60,7 @@
         <h2 class="text-center">Delivery Map</h2>
         <div id="map"></div>
     </div>
-
+<footer><p class="text-center">Basic Routing Tool by Renato</p></footer>
     <script src="js.js"></script>
 </body>
 </html>
