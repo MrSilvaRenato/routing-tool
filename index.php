@@ -36,7 +36,7 @@
 
         <div id="message" class="my-3"></div>
 
-        <h2 class="text-center">Delivery Map</h2>
+        
         <div id="map"></div>
     </div>
 
