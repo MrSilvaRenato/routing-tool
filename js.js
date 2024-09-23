@@ -1,16 +1,22 @@
 // Initialize the map once
-var map = L.map('map').setView([-27.4698, 153.0251], 8); // Brisbane coordinates
+var map = L.map('map').setView([-27.4698, 153.0251], 8);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Load the map markers once the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function() {
-    loadMapMarkers();  // Load markers on page load
+    loadMapMarkers();
 
-    // Refresh the markers every 30 seconds (adjust the time as needed)
-    setInterval(loadMapMarkers, 30000); // 30000ms = 30 seconds
+    // Prevent default form submission and handle file upload
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent page reload
+
+        var formData = new FormData(this);
+        uploadSpreadsheet(formData);
+    });
+
+    setInterval(loadMapMarkers, 30000);
 });
 
 function loadMapMarkers() {

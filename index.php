@@ -26,20 +26,18 @@
 
     <!-- Flexbox container for upload and delete all controls -->
     <div id="controls">
-        <form action="upload.php" method="post" enctype="multipart/form-data" id="uploadForm">
+        <form id="uploadForm" enctype="multipart/form-data">
             <input type="file" name="spreadsheet" accept=".xlsx, .xls, .csv" required>
             <input type="submit" value="Upload">
         </form>
-        
-        <!-- Delete All button next to the form -->
         <button type="button" id="deleteAllBtn" onclick="deleteAllRecords()">Delete All</button>
     </div>
 
     <div id="message"></div>
 
     <h2>Delivery Map</h2>
-    <div id="map"></div> <!-- Map section -->
+    <div id="map"></div>
 
-    <script src="js.js"></script>  <!-- External JS file -->
+    <script src="js.js"></script>
 </body>
 </html>
