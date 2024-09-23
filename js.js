@@ -19,6 +19,36 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(loadMapMarkers, 30000);
 });
 
+// Function to handle spreadsheet upload
+function uploadSpreadsheet(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const formData = new FormData(document.getElementById('uploadForm')); // Get the form data
+
+    fetch('upload.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+        const messageDiv = document.getElementById('message');
+        if (result.message) {
+            messageDiv.textContent = result.message;
+            messageDiv.style.color = 'green';
+            loadMapMarkers(); // Refresh markers after upload
+        } else if (result.error) {
+            messageDiv.textContent = 'Error: ' + result.error;
+            messageDiv.style.color = 'red';
+        }
+    })
+    .catch(err => {
+        console.error('Error uploading spreadsheet:', err);
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = 'Error uploading spreadsheet.';
+        messageDiv.style.color = 'red';
+    });
+}
+
 function loadMapMarkers() {
     fetch('get_deliveries.php') // Fetch deliveries from the server
         .then(response => {

@@ -26,7 +26,7 @@
 
     <!-- Flexbox container for upload and delete all controls -->
     <div id="controls">
-        <form id="uploadForm" enctype="multipart/form-data">
+        <form id="uploadForm" enctype="multipart/form-data" onsubmit="uploadSpreadsheet(event)">
             <input type="file" name="spreadsheet" accept=".xlsx, .xls, .csv" required>
             <input type="submit" value="Upload">
         </form>
