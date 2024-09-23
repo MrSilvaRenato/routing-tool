@@ -32,7 +32,9 @@
     </form>
     <button type="button" id="deleteAllBtn" onclick="deleteAllRecords()">Delete All</button>
 </div>
-
+<div id="loadingMessage" style="display:none;">
+    Manifest is getting uploaded, please wait<span id="loadingDots">...</span>
+</div>
     <div id="message"></div>
 
     <h2>Delivery Map</h2>

@@ -21,6 +21,11 @@ document.addEventListener('DOMContentLoaded', function() {
 function uploadSpreadsheet() {
     const formData = new FormData(document.getElementById('uploadForm')); // Get the form data
 
+    // Show loading message
+    const loadingMessage = document.getElementById('loadingMessage');
+    loadingMessage.style.display = 'block';
+    animateLoadingDots();
+
     fetch('upload.php', {
         method: 'POST',
         body: formData
@@ -28,6 +33,8 @@ function uploadSpreadsheet() {
     .then(response => response.json())
     .then(result => {
         const messageDiv = document.getElementById('message');
+        loadingMessage.style.display = 'none'; // Hide loading message
+
         if (result.message) {
             messageDiv.textContent = result.message;
             messageDiv.style.color = 'green';
@@ -40,9 +47,20 @@ function uploadSpreadsheet() {
     .catch(err => {
         console.error('Error uploading spreadsheet:', err);
         const messageDiv = document.getElementById('message');
+        loadingMessage.style.display = 'none'; // Hide loading message
         messageDiv.textContent = 'Error uploading spreadsheet.';
         messageDiv.style.color = 'red';
     });
+}
+
+// Function to animate loading dots
+function animateLoadingDots() {
+    const loadingDots = document.getElementById('loadingDots');
+    let dotCount = 0;
+    setInterval(() => {
+        dotCount = (dotCount + 1) % 4; // Cycle through 0 to 3
+        loadingDots.textContent = '.'.repeat(dotCount); // Update dots
+    }, 500); // Change dots every 500ms
 }
 
 function loadMapMarkers() {
