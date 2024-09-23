@@ -23,17 +23,15 @@
         <h2 class="text-center">Basic Routing Tool by Renato</h2>
 
         <div id="controls" class="d-flex justify-content-center my-3">
-    <form id="uploadForm" enctype="multipart/form-data" class="form-inline">
-        <div class="custom-file mb-2 mr-2">
-            <input type="file" name="spreadsheet" accept=".xlsx, .xls, .csv" required class="custom-file-input" id="customFile">
-            <label class="custom-file-label" for="customFile">Choose file</label>
+            <form id="uploadForm" enctype="multipart/form-data" class="form-inline">
+                <div class="custom-file mb-2 mr-2">
+                    <input type="file" name="spreadsheet" accept=".xlsx, .xls, .csv" required class="custom-file-input" id="customFile">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Upload</button>
+            </form>
+            <button type="button" id="deleteAllBtn" class="btn btn-danger mb-2 ml-2" onclick="deleteAllRecords()">Delete All</button>
         </div>
-        <button type="submit" class="btn btn-primary mb-2">Upload</button>
-    </form>
-    <div class="ml-2">
-        <button type="button" id="deleteAllBtn" class="btn btn-danger">Delete All</button>
-    </div>
-</div>
 
         <div id="loadingMessage" class="alert alert-info" style="display:none;">
             Manifest is getting uploaded, please wait<span id="loadingDots">...</span>
