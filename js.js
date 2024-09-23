@@ -11,18 +11,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Prevent default form submission and handle file upload
     document.getElementById('uploadForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent page reload
-
-        var formData = new FormData(this);
-        uploadSpreadsheet(formData);
+        uploadSpreadsheet(); // Call without passing event
     });
 
     setInterval(loadMapMarkers, 30000);
 });
 
 // Function to handle spreadsheet upload
-function uploadSpreadsheet(event) {
-    event.preventDefault(); // Prevent the default form submission
-
+function uploadSpreadsheet() {
     const formData = new FormData(document.getElementById('uploadForm')); // Get the form data
 
     fetch('upload.php', {
