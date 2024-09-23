@@ -205,3 +205,9 @@ function deleteRecord(deliveryId) {
         .catch(err => console.error('Error deleting record:', err));
     }
 }
+
+// Update the file input label on file selection
+document.getElementById('customFile').addEventListener('change', function(event) {
+    var label = event.target.nextElementSibling;
+    label.textContent = event.target.files[0] ? event.target.files[0].name : 'Choose file';
+});
