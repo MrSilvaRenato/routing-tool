@@ -29,8 +29,9 @@
                     <label class="custom-file-label" for="customFile">Choose file</label>
                 </div>
                 <button type="submit" class="btn btn-primary mb-2">Upload</button>
+                <button type="button" id="deleteAllBtn" class="btn btn-danger mb-2 ml-2" onclick="deleteAllRecords()">Delete All</button>
             </form>
-            <button type="button" id="deleteAllBtn" class="btn btn-danger mb-2 ml-2" onclick="deleteAllRecords()">Delete All</button>
+           
         </div>
 
         <div id="loadingMessage" class="alert alert-info" style="display:none;">
