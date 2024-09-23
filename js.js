@@ -90,12 +90,22 @@ function loadMapMarkers() {
 
                     // Popup content with drop number input field, assign drop button, and delete record button
                     var popupContent = `
-                        <strong>Address: ${location.street_number} ${location.street_name}<br>
-                        ${location.suburb}, ${location.city}</strong><br>
-                        <input type="number" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
-                        <button onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
-                        <button onclick="deleteRecord('${location.delivery_id}')">Delete Record</button>
-                    `;
+                    <div class="popup-content">
+                        <strong>Address:</strong><br>
+                        <span>${location.street_number} ${location.street_name}</span><br>
+                        <span>${location.suburb}, ${location.city}</span><br><br>
+                        
+                        <div class="form-group">
+                            <label for="dropNumber${location.delivery_id}">Drop Number:</label>
+                            <input type="number" class="form-control" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-success" onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
+                            <button class="btn btn-danger" onclick="deleteRecord('${location.delivery_id}')">Delete Record</button>
+                        </div>
+                    </div>
+                `;
                     marker.bindPopup(popupContent).openPopup();
 
                     // Show drop number on the marker if assigned

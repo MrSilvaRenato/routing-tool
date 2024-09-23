@@ -16,6 +16,23 @@
             width: 100%;
             margin-top: 20px;
         }
+    
+        .popup-content {
+            min-width: 200px; /* Set a minimum width for popups */
+        }
+
+        .popup-content strong {
+            font-size: 1.2em;
+        }
+
+        .popup-content .form-group {
+            margin-bottom: 1em; /* Space between form elements */
+        }
+
+        .popup-content button {
+            margin-top: 10px; /* Space above buttons */
+    }
+</style>
     </style>
 </head>
 <body>
