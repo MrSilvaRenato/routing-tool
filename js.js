@@ -210,6 +210,16 @@ function highlightSelectedMarkers() {
     }
 }
 
+// Function to animate loading dots
+function animateLoadingDots() {
+    const loadingDots = document.getElementById('loadingDots');
+    let dotCount = 0;
+    setInterval(() => {
+        dotCount = (dotCount + 1) % 4; // Cycle through 0 to 3
+        loadingDots.textContent = '.'.repeat(dotCount); // Update dots
+    }, 500); // Change dots every 500ms
+}
+
 
 
 
