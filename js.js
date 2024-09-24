@@ -5,12 +5,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Variables for selection
-let selectedDrops = [];
-let selectionBox = null;
-let startPoint = null;
-let isSelecting = false;
-let markers = []; // Array to hold marker references
 
 // Load map markers when DOM content is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -79,12 +73,18 @@ function uploadSpreadsheet() {
 }
 
 // Function to set up selection feature on the map
+let selectionBox; // Variable for selection box
+let startPoint; // Starting point for the selection
+let isSelecting = false; // Track whether selection is in progress
+let markers = []; // Array to store markers
+
+// Function to set up selection feature on the map
 function setupSelectionFeature() {
     // Mouse down event
     map.on('mousedown', function(e) {
         if (e.originalEvent.button === 2) { // Right mouse button
             e.originalEvent.preventDefault(); // Prevent context menu from appearing
-            startPoint = e.latlng;
+            startPoint = e.latlng; // Get starting point
             selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 });
             map.addLayer(selectionBox);
             isSelecting = true; // Set selection mode
@@ -96,7 +96,7 @@ function setupSelectionFeature() {
     map.on('mousemove', function(e) {
         if (isSelecting && selectionBox) {
             const bounds = L.latLngBounds(startPoint, e.latlng);
-            selectionBox.setBounds(bounds);
+            selectionBox.setBounds(bounds); // Update selection box bounds
         }
     });
 
@@ -104,7 +104,7 @@ function setupSelectionFeature() {
     map.on('mouseup', function(e) {
         if (isSelecting && selectionBox && e.originalEvent.button === 2) { // Right mouse button
             map.removeLayer(selectionBox);
-            selectionBox = null;
+            selectionBox = null; // Clear selection box
             isSelecting = false; // Reset selection mode
             map.dragging.enable(); // Re-enable map dragging
             
@@ -124,9 +124,13 @@ function highlightSelectedMarkers() {
     const bounds = selectionBox ? selectionBox.getBounds() : null; // Get the bounds of the selection box
 
     if (bounds) { // Ensure bounds are defined
+        console.log("Selection Bounds: ", bounds); // Debug: Log selection bounds
         markers.forEach(marker => {
+            console.log("Marker Position: ", marker.getLatLng()); // Debug: Log marker positions
+
             // Check if the marker is within the bounds
             if (bounds.contains(marker.getLatLng())) {
+                console.log("Marker Selected: ", marker.getLatLng()); // Debug: Log selected marker
                 // Style the marker to indicate selection
                 marker.setStyle({ color: 'red', fillColor: 'red', fillOpacity: 0.5 });
             } else {
@@ -136,6 +140,12 @@ function highlightSelectedMarkers() {
         });
     }
 }
+
+// Call the setup function to initialize the selection feature
+setupSelectionFeature();
+
+
+
 // Function to assign drops to a run
 function assignDropsToRun(selectedDrops) {
     const runNumber = prompt("Enter run number:");
