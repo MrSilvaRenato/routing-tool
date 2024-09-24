@@ -115,7 +115,7 @@ function setupSelectionFeature() {
             selectionBox = null;
             isSelecting = false; // Reset selection mode
             map.dragging.enable(); // Re-enable map dragging
-            assignDropsToRun(selectedDrops);
+            assignDropsToRun(selectedDrops); // Assign drops after selection
         }
     });
 
@@ -129,24 +129,11 @@ function setupSelectionFeature() {
 function assignDropsToRun(selectedDrops) {
     const runNumber = prompt("Enter run number:");
     if (runNumber) {
-        // Send selectedDrops and runNumber to the backend using AJAX
         const dropIds = selectedDrops.map(marker => marker.options.id); // Assuming markers have an 'id' option
-        $.ajax({
-            url: 'your_backend_endpoint', // Replace with your backend endpoint
-            method: 'POST',
-            data: {
-                runNumber: runNumber,
-                drops: dropIds
-            },
-            success: function(response) {
-                alert('Drops assigned successfully!');
-                // Handle success response
-            },
-            error: function(error) {
-                alert('Error assigning drops.');
-                // Handle error response
-            }
-        });
+        // For demonstration, show an alert with run number and selected drop IDs
+        alert(`Run Number: ${runNumber}\nSelected Drops: ${dropIds.join(', ')}`);
+        // Here you would send the selectedDrops and runNumber to your backend using AJAX
+        // Implement your AJAX request here as needed
     }
 }
 
