@@ -77,7 +77,6 @@ function uploadSpreadsheet() {
     });
 }
 
-// Ensure you have this array declared and populated when loading markers
 let markers = []; // This should be populated when loading your map markers
 
 // Function to set up selection feature on the map
@@ -105,9 +104,27 @@ function setupSelectionFeature() {
                 markers.forEach(marker => {
                     if (bounds.contains(marker.getLatLng())) {
                         selectedDrops.push(marker); // Add to selection
-                        marker.setStyle({ color: 'blue' }); // Highlight
+                        // Apply styles for selected markers
+                        marker.setStyle({ 
+                            color: 'rgba(0, 0, 255, 0.5)', // Blue background with transparency
+                            radius: 8, // Set the radius for the circle
+                            fillColor: 'rgba(0, 0, 255, 0.5)', // Fill color
+                            fillOpacity: 0.5 // Background opacity
+                        });
+                        // Change text color to white
+                        if (marker._icon) {
+                            marker._icon.style.color = 'white'; // Assuming markers have a text/icon property
+                        }
                     } else {
-                        marker.setStyle({ color: 'red' }); // Reset others
+                        // Reset styles for unselected markers
+                        marker.setStyle({ 
+                            color: 'red',
+                            fillColor: 'red', 
+                            fillOpacity: 0.5 
+                        });
+                        if (marker._icon) {
+                            marker._icon.style.color = 'black'; // Reset text color
+                        }
                     }
                 });
             }
@@ -134,7 +151,10 @@ function setupSelectionFeature() {
 
 // Function to assign drops to a run
 function assignDropsToRun(selectedDrops) {
-    const runNumber = prompt("Enter run number:");
+    // Instead of prompting for a run number, you could directly handle the selection
+    // Assuming you'll implement your own method to select run numbers without an alert.
+    const runNumber = "SomeRunNumber"; // Replace with your logic for run number selection
+
     if (runNumber) {
         // Send selectedDrops and runNumber to the backend using AJAX
         const dropIds = selectedDrops.map(marker => marker.options.id); // Assuming markers have an 'id' option
@@ -146,7 +166,6 @@ function assignDropsToRun(selectedDrops) {
                 drops: dropIds
             },
             success: function(response) {
-                alert('Drops assigned successfully!');
                 // Reset styles after successful assignment
                 selectedDrops.forEach(marker => {
                     marker.setStyle({ color: 'green' }); // Change to a new color to indicate assigned
@@ -155,14 +174,17 @@ function assignDropsToRun(selectedDrops) {
                 selectedDrops = [];
             },
             error: function(error) {
-                alert('Error assigning drops.');
+                console.error('Error assigning drops:', error);
                 // Handle error response
             }
         });
     } else {
         // Clear styles if no run number is entered
         selectedDrops.forEach(marker => {
-            marker.setStyle({ color: 'red' }); // Reset color if no assignment is made
+            marker.setStyle({ color: 'red', fillColor: 'red', fillOpacity: 0.5 }); // Reset color if no assignment is made
+            if (marker._icon) {
+                marker._icon.style.color = 'black'; // Reset text color if no assignment
+            }
         });
         selectedDrops = [];
     }
