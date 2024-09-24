@@ -75,11 +75,9 @@
                     <label class="custom-file-label" for="customFile">Upload Manifest</label>
                 </div>
                 <button type="submit" class="btn btn-primary mb-2">Upload</button>
-            </form>
-
-            <!-- Buttons outside the form but still aligned -->
-            <button type="button" id="deleteAllBtn" class="btn btn-danger mb-2 ml-2" onclick="deleteAllRecords()">Delete All</button>
-            <button type="button" id="optimizeDropsBtn" class="btn btn-success mb-2 ml-2" onclick="optimizeDrops()">Optimize Drops</button>
+                <button type="button" id="deleteAllBtn" class="btn btn-danger mb-2 ml-2" onclick="deleteAllRecords()">Delete All</button>
+                <button type="button" id="optimizeDropsBtn" class="btn btn-success mb-2 ml-2" onclick="optimizeDrops()">Optimize Drops</button>
+            </form>      
         </div>
     </div>
 
