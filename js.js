@@ -5,6 +5,12 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+// Global variables
+let selectionBox; // Variable for selection box
+let startPoint; // Starting point for the selection
+let isSelecting = false; // Track whether selection is in progress
+let markers = []; // Array to store markers
+
 // Load map markers when DOM content is loaded
 document.addEventListener('DOMContentLoaded', function() {
     loadMapMarkers();
@@ -21,6 +27,76 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up map event listeners for selection feature
     setupSelectionFeature();
 });
+
+// Function to load map markers
+function loadMapMarkers() {
+    fetch('get_deliveries.php') // Fetch deliveries from the server
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(locations => {
+            if (!Array.isArray(locations)) {
+                throw new Error('Expected an array of locations');
+            }
+
+            // Clear existing markers before adding new ones
+            markers.forEach(marker => {
+                map.removeLayer(marker); // Remove each marker from the map
+            });
+
+            // Reset markers array
+            markers = [];
+
+            // Add markers to the map
+            locations.forEach(location => {
+                if (location.latitude && location.longitude) {
+                    var marker = L.marker([location.latitude, location.longitude]).addTo(map);
+
+                    // Popup content with drop number input field, assign drop button, and delete record button
+                    var popupContent = `
+                    <div class="popup-content">
+                        <strong>Address:</strong><br>
+                        <span>${location.street_number} ${location.street_name}</span><br>
+                        <span>${location.suburb}, ${location.city}</span><br><br>
+                        
+                        <div class="form-group">
+                            <label for="dropNumber${location.delivery_id}">Drop Number:</label>
+                            <input type="number" class="form-control" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-success" onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
+                            <button class="btn btn-danger" onclick="deleteRecord('${location.delivery_id}')">Delete Record</button>
+                        </div>
+                    </div>
+                `;
+                    marker.bindPopup(popupContent).openPopup();
+
+                    // Show drop number on the marker if assigned
+                    if (location.drop_number) {
+                        var dropLabel = `${location.drop_number}`;
+                        var dropIcon = L.divIcon({
+                            className: 'drop-icon',
+                            html: `<div style="color: red; font-size: 20px; font-weight: bold; text-align: center;">
+                            ${dropLabel}
+                        </div>`,
+                            iconSize: [30, 42],
+                            popupAnchor: [0, -30]
+                        });
+                        marker.setIcon(dropIcon);
+                    }
+
+                    markers.push(marker); // Store marker reference
+                } else {
+                    console.error('Location missing coordinates:', location);
+                }
+            });
+        })
+        .catch(err => console.error('Error fetching locations:', err));
+}
 
 // Function to handle spreadsheet upload
 function uploadSpreadsheet() {
@@ -68,34 +144,6 @@ function uploadSpreadsheet() {
         loadingMessage.style.display = 'none'; // Hide loading message
         messageDiv.textContent = 'Error uploading spreadsheet.';
         messageDiv.style.color = 'red';
-    });
-}
-
-// Function to set up selection feature on the map
-let selectionBox; // Variable for selection box
-let startPoint; // Starting point for the selection
-let isSelecting = false; // Track whether selection is in progress
-let markers = []; // Array to store markers
-
-// Function to load map markers (make sure to populate the markers array)
-function loadMapMarkers() {
-    // Clear existing markers
-    markers.forEach(marker => {
-        map.removeLayer(marker); // Remove from map
-    });
-    markers = []; // Clear markers array
-
-    // Example: Replace with actual loading logic from your database
-    const markerData = [
-        { lat: -27.4698, lng: 153.0251 },
-        { lat: -27.4800, lng: 153.0200 },
-        // Add more marker data as needed
-    ];
-
-    markerData.forEach(data => {
-        const marker = L.circleMarker([data.lat, data.lng], { color: 'blue', fillOpacity: 0.5 });
-        marker.addTo(map);
-        markers.push(marker); // Store the marker instance
     });
 }
 
@@ -162,116 +210,6 @@ function highlightSelectedMarkers() {
     }
 }
 
-// Call the setup function to initialize the selection feature
-setupSelectionFeature();
-
-
-
-// Function to assign drops to a run
-function assignDropsToRun(selectedDrops) {
-    const runNumber = prompt("Enter run number:");
-    if (runNumber) {
-        // Send selectedDrops and runNumber to the backend using AJAX
-        const dropIds = selectedDrops.map(marker => marker.options.id); // Assuming markers have an 'id' option
-        $.ajax({
-            url: 'your_backend_endpoint', // Replace with your backend endpoint
-            method: 'POST',
-            data: {
-                runNumber: runNumber,
-                drops: dropIds
-            },
-            success: function(response) {
-                alert('Drops assigned successfully!');
-                // Handle success response
-            },
-            error: function(error) {
-                alert('Error assigning drops.');
-                // Handle error response
-            }
-        });
-    }
-}
-
-// Function to animate loading dots
-function animateLoadingDots() {
-    const loadingDots = document.getElementById('loadingDots');
-    let dotCount = 0;
-    setInterval(() => {
-        dotCount = (dotCount + 1) % 4; // Cycle through 0 to 3
-        loadingDots.textContent = '.'.repeat(dotCount); // Update dots
-    }, 500); // Change dots every 500ms
-}
-
-function loadMapMarkers() {
-    fetch('get_deliveries.php') // Fetch deliveries from the server
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok: ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(locations => {
-            if (!Array.isArray(locations)) {
-                throw new Error('Expected an array of locations');
-            }
-
-            // Clear existing markers before adding new ones
-            map.eachLayer(function(layer) {
-                if (layer instanceof L.Marker) {
-                    map.removeLayer(layer);
-                }
-            });
-
-            // Add markers to the map
-            markers = []; // Reset markers array
-            locations.forEach(location => {
-                if (location.latitude && location.longitude) {
-                    var marker = L.marker([location.latitude, location.longitude]).addTo(map);
-
-                    // Popup content with drop number input field, assign drop button, and delete record button
-                    var popupContent = `
-                    <div class="popup-content">
-                        <strong>Address:</strong><br>
-                        <span>${location.street_number} ${location.street_name}</span><br>
-                        <span>${location.suburb}, ${location.city}</span><br><br>
-                        
-                        <div class="form-group">
-                            <label for="dropNumber${location.delivery_id}">Drop Number:</label>
-                            <input type="number" class="form-control" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <button class="btn btn-success" onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
-                            <button class="btn btn-danger" onclick="deleteRecord('${location.delivery_id}')">Delete Record</button>
-                        </div>
-                    </div>
-                `;
-                    marker.bindPopup(popupContent).openPopup();
-
-                    // Show drop number on the marker if assigned
-                    if (location.drop_number) {
-                        var dropLabel = `${location.drop_number}`;
-                        var dropIcon = L.divIcon({
-                            className: 'drop-icon',
-                            html: `<div style="color: red; font-size: 20px; font-weight: bold; text-align: center;">
-                            ${dropLabel}
-                        </div>`,
-                            iconSize: [30, 42],
-                            popupAnchor: [0, -30]
-                        });
-                        marker.setIcon(dropIcon);
-                    }
-
-                    markers.push(marker); // Store marker reference
-                } else {
-                    console.error('Location missing coordinates:', location);
-                }
-            });
-        })
-        .catch(err => console.error('Error fetching locations:', err));
-}
-
-// Remaining functions remain unchanged
 
 
 
