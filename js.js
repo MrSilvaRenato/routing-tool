@@ -16,20 +16,24 @@ let isSelecting = false;
 
 // Load map markers when DOM content is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    loadMapMarkers();
-
-    // Prevent default form submission and handle file upload
-    document.getElementById('uploadForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent page reload
-        uploadSpreadsheet(); // Call without passing event
-    });
-
-    // Load markers every 30 seconds
-    setInterval(loadMapMarkers, 30000);
+    loadMapMarkers(); // Load markers from the spreadsheet
 
     // Set up map event listeners for selection feature
     setupSelectionFeature();
 });
+
+// Function to load markers from the spreadsheet
+function loadMapMarkers() {
+    // Assuming you have logic here to load your markers into the markers array
+    // Example:
+    // markers.push(L.marker([lat, lng]).addTo(map));
+
+    // Sample marker for demonstration; replace with your actual data
+    const sampleMarker = L.circleMarker([-27.4698, 153.0251], { color: 'red', radius: 8, fill: true, fillColor: 'rgba(255, 255, 255, 0)', fillOpacity: 0 });
+    sampleMarker.options.id = 1; // Set a unique ID for the marker
+    markers.push(sampleMarker); // Add to markers array
+    sampleMarker.addTo(map); // Add marker to the map
+}
 
 // Function to set up selection feature on the map
 function setupSelectionFeature() {
@@ -52,12 +56,13 @@ function setupSelectionFeature() {
             const bounds = L.latLngBounds(startPoint, e.latlng);
             selectionBox.setBounds(bounds);
             selectedDrops = []; // Reset selection on new move
+            
+            // Highlight markers within the selection bounds
             markers.forEach(marker => {
                 if (bounds.contains(marker.getLatLng())) {
                     selectedDrops.push(marker); // Add to selection
                     // Highlight the marker with a blue background and white text
                     marker.setStyle({ color: 'blue', fillColor: 'rgba(0, 0, 255, 0.5)', fillOpacity: 0.5 });
-                    marker.bindTooltip(marker.options.title, { permanent: true, direction: 'top', className: 'marker-tooltip' }).openOn(map);
                 } else {
                     // Reset styles for unselected markers
                     marker.setStyle({ color: 'red', fillColor: 'rgba(255, 255, 255, 0)', fillOpacity: 0 });
@@ -74,6 +79,11 @@ function setupSelectionFeature() {
             selectionBox = null;
             isSelecting = false; // Reset selection mode
             map.dragging.enable(); // Re-enable map dragging
+            
+            // After selection, keep selected markers highlighted
+            selectedDrops.forEach(marker => {
+                marker.setStyle({ color: 'blue', fillColor: 'rgba(0, 0, 255, 0.5)', fillOpacity: 0.5 });
+            });
         }
     });
 
