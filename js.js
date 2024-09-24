@@ -53,7 +53,7 @@ function uploadSpreadsheet() {
         if (result.errors && result.errors.length > 0) {
             result.errors.forEach(error => {
                 const errorItem = document.createElement('div');
-                errorItem.textContent = `Address: ${error.address} - Reason: ${error.reason}`;
+                errorItem.textContent = `Address error, this was not uploaded: ${error.address} - Reason: ${error.reason}`;
                 errorDiv.appendChild(errorItem);
             });
         }
