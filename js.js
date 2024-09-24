@@ -311,20 +311,32 @@ function getDistance(origin, destination) {
     return distance;
 }
 
-let selectedDrops = [];
-let selectionBox;
-let startPoint;
+
+
+
+
+let selectedDrops = []; // Declare selectedDrops only once
+let selectionBox = null;
+let startPoint = null;
+let isSelecting = false;
 
 // Mouse down event
 map.on('mousedown', function(e) {
-    startPoint = e.latlng;
-    selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 });
-    map.addLayer(selectionBox);
+    // Start selection with the right mouse button (button 2)
+    if (e.originalEvent.button === 2) {
+        e.preventDefault(); // Prevent context menu from appearing
+        startPoint = e.latlng;
+        selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 });
+        map.addLayer(selectionBox);
+        isSelecting = true; // Set selection mode
+        // Disable map dragging while selecting
+        map.dragging.disable();
+    }
 });
 
 // Mouse move event
 map.on('mousemove', function(e) {
-    if (selectionBox) {
+    if (isSelecting && selectionBox) {
         const bounds = L.latLngBounds(startPoint, e.latlng);
         selectionBox.setBounds(bounds);
         selectedDrops = []; // Reset selection on new move
@@ -340,11 +352,14 @@ map.on('mousemove', function(e) {
 });
 
 // Mouse up event
-map.on('mouseup', function() {
-    if (selectionBox) {
+map.on('mouseup', function(e) {
+    // Finish selection with the right mouse button (button 2)
+    if (isSelecting && selectionBox && e.originalEvent.button === 2) {
         map.removeLayer(selectionBox);
         selectionBox = null;
-        // Here you can add a function to assign the selected drops to a run number
+        isSelecting = false; // Reset selection mode
+        map.dragging.enable(); // Re-enable map dragging
+        // Assign the selected drops to a run number
         assignDropsToRun(selectedDrops);
     }
 });
@@ -354,7 +369,6 @@ function assignDropsToRun(selectedDrops) {
     const runNumber = prompt("Enter run number:");
     if (runNumber) {
         // Send selectedDrops and runNumber to the backend using AJAX
-        // Implement your AJAX request here
         const dropIds = selectedDrops.map(marker => marker.options.id); // Assuming markers have an 'id' option
         $.ajax({
             url: 'your_backend_endpoint', // Replace with your backend endpoint
@@ -373,4 +387,9 @@ function assignDropsToRun(selectedDrops) {
             }
         });
     }
-}
+});
+
+// Context menu event to disable right-click context menu
+map.on('contextmenu', function(e) {
+    e.originalEvent.preventDefault(); // Prevent default context menu
+});
