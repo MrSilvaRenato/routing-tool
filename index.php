@@ -86,7 +86,7 @@
         </div>
 
         <div id="message" class="my-3"></div>
-
+        <div id="errorMessages" style="color: red;"></div>
     <!-- Map container with proper sizing -->
     <div id="map" class="w-100" style="height: 600px;"></div>
 </div>

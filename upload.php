@@ -12,6 +12,9 @@ if (isset($_FILES['spreadsheet'])) {
 
     // Connect to the database
 
+    // Initialize an array to collect errors
+    $uploadErrors = [];
+
     foreach ($data as $row) {
         // Data from spreadsheet
         $number = $row[0];
@@ -33,6 +36,10 @@ if (isset($_FILES['spreadsheet'])) {
 
         // Check if coordinates are valid (not 0, 0)
         if ($latitude == 0 && $longitude == 0) {
+            $uploadErrors[] = [
+                'address' => $address,
+                'reason' => 'Invalid coordinates.'
+            ];
             error_log("Skipping entry for $address: Invalid coordinates.");
             continue; // Skip this entry
         }
@@ -45,15 +52,21 @@ if (isset($_FILES['spreadsheet'])) {
         if ($stmt) {
             $stmt->bind_param("isssssssdd", $number, $street_name, $suburb, $city, $postcode, $phone, $order_id, $delivery_id, $latitude, $longitude);
             if (!$stmt->execute()) {
+                $uploadErrors[] = [
+                    'address' => $address,
+                    'reason' => 'Database query failed: ' . $stmt->error
+                ];
                 error_log("SQL Error for delivery_id $delivery_id: " . $stmt->error); // Log the SQL error
-                echo json_encode(['error' => 'Database query failed: ' . $stmt->error]);
                 $stmt->close();
                 continue; // Skip to the next entry
             }
             $stmt->close();
         } else {
+            $uploadErrors[] = [
+                'address' => $address,
+                'reason' => 'Database query preparation failed: ' . $conn->error
+            ];
             error_log("Database query preparation failed: " . $conn->error); // Log preparation error
-            echo json_encode(['error' => 'Database query preparation failed: ' . $conn->error]);
             continue; // Skip to the next entry
         }
     }
@@ -61,8 +74,14 @@ if (isset($_FILES['spreadsheet'])) {
     // Close the connection
     $conn->close();
 
-    // Return a success message
-    echo json_encode(['message' => 'Spreadsheet uploaded successfully!']);
+    // Prepare the response
+    $response = ['message' => 'Spreadsheet uploaded successfully!'];
+    if (!empty($uploadErrors)) {
+        $response['errors'] = $uploadErrors; // Add errors to response if any
+    }
+
+    // Return the response as JSON
+    echo json_encode($response);
     exit;
 }
 

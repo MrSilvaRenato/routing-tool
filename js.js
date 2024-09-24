@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Function to handle spreadsheet upload
+// Function to handle spreadsheet upload
 function uploadSpreadsheet() {
     const formData = new FormData(document.getElementById('uploadForm')); // Get the form data
 
@@ -35,6 +36,10 @@ function uploadSpreadsheet() {
         const messageDiv = document.getElementById('message');
         loadingMessage.style.display = 'none'; // Hide loading message
 
+        // Clear previous errors
+        const errorDiv = document.getElementById('errorMessages');
+        errorDiv.innerHTML = '';
+
         if (result.message) {
             messageDiv.textContent = result.message;
             messageDiv.style.color = 'green';
@@ -42,6 +47,15 @@ function uploadSpreadsheet() {
         } else if (result.error) {
             messageDiv.textContent = 'Error: ' + result.error;
             messageDiv.style.color = 'red';
+        }
+
+        // Display any upload errors
+        if (result.errors && result.errors.length > 0) {
+            result.errors.forEach(error => {
+                const errorItem = document.createElement('div');
+                errorItem.textContent = `Address: ${error.address} - Reason: ${error.reason}`;
+                errorDiv.appendChild(errorItem);
+            });
         }
     })
     .catch(err => {
