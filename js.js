@@ -5,6 +5,13 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+// Variables for selection
+let selectedDrops = [];
+let selectionBox = null;
+let startPoint = null;
+let isSelecting = false;
+
+// Load map markers when DOM content is loaded
 document.addEventListener('DOMContentLoaded', function() {
     loadMapMarkers();
 
@@ -14,10 +21,13 @@ document.addEventListener('DOMContentLoaded', function() {
         uploadSpreadsheet(); // Call without passing event
     });
 
+    // Load markers every 30 seconds
     setInterval(loadMapMarkers, 30000);
+
+    // Set up map event listeners for selection feature
+    setupSelectionFeature();
 });
 
-// Function to handle spreadsheet upload
 // Function to handle spreadsheet upload
 function uploadSpreadsheet() {
     const formData = new FormData(document.getElementById('uploadForm')); // Get the form data
@@ -66,6 +76,80 @@ function uploadSpreadsheet() {
         messageDiv.style.color = 'red';
     });
 }
+
+// Function to set up selection feature on the map
+function setupSelectionFeature() {
+    // Mouse down event
+    map.on('mousedown', function(e) {
+        if (e.originalEvent.button === 2) { // Right mouse button
+            e.preventDefault(); // Prevent context menu from appearing
+            startPoint = e.latlng;
+            selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 });
+            map.addLayer(selectionBox);
+            isSelecting = true; // Set selection mode
+            map.dragging.disable(); // Disable map dragging while selecting
+        }
+    });
+
+    // Mouse move event
+    map.on('mousemove', function(e) {
+        if (isSelecting && selectionBox) {
+            const bounds = L.latLngBounds(startPoint, e.latlng);
+            selectionBox.setBounds(bounds);
+            selectedDrops = []; // Reset selection on new move
+            markers.forEach(marker => {
+                if (bounds.contains(marker.getLatLng())) {
+                    selectedDrops.push(marker); // Add to selection
+                    marker.setStyle({ color: 'blue' }); // Highlight
+                } else {
+                    marker.setStyle({ color: 'red' }); // Reset others
+                }
+            });
+        }
+    });
+
+    // Mouse up event
+    map.on('mouseup', function(e) {
+        if (isSelecting && selectionBox && e.originalEvent.button === 2) { // Right mouse button
+            map.removeLayer(selectionBox);
+            selectionBox = null;
+            isSelecting = false; // Reset selection mode
+            map.dragging.enable(); // Re-enable map dragging
+            assignDropsToRun(selectedDrops);
+        }
+    });
+
+    // Context menu event to disable right-click context menu
+    map.on('contextmenu', function(e) {
+        e.originalEvent.preventDefault(); // Prevent default context menu
+    });
+}
+
+// Function to assign drops to a run
+function assignDropsToRun(selectedDrops) {
+    const runNumber = prompt("Enter run number:");
+    if (runNumber) {
+        // Send selectedDrops and runNumber to the backend using AJAX
+        const dropIds = selectedDrops.map(marker => marker.options.id); // Assuming markers have an 'id' option
+        $.ajax({
+            url: 'your_backend_endpoint', // Replace with your backend endpoint
+            method: 'POST',
+            data: {
+                runNumber: runNumber,
+                drops: dropIds
+            },
+            success: function(response) {
+                alert('Drops assigned successfully!');
+                // Handle success response
+            },
+            error: function(error) {
+                alert('Error assigning drops.');
+                // Handle error response
+            }
+        });
+    }
+}
+
 
 // Function to animate loading dots
 function animateLoadingDots() {
@@ -315,81 +399,3 @@ function getDistance(origin, destination) {
 
 
 
-let selectedDrops = []; // Declare selectedDrops only once
-let selectionBox = null;
-let startPoint = null;
-let isSelecting = false;
-
-// Mouse down event
-map.on('mousedown', function(e) {
-    // Start selection with the right mouse button (button 2)
-    if (e.originalEvent.button === 2) {
-        e.preventDefault(); // Prevent context menu from appearing
-        startPoint = e.latlng;
-        selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 });
-        map.addLayer(selectionBox);
-        isSelecting = true; // Set selection mode
-        // Disable map dragging while selecting
-        map.dragging.disable();
-    }
-});
-
-// Mouse move event
-map.on('mousemove', function(e) {
-    if (isSelecting && selectionBox) {
-        const bounds = L.latLngBounds(startPoint, e.latlng);
-        selectionBox.setBounds(bounds);
-        selectedDrops = []; // Reset selection on new move
-        markers.forEach(marker => {
-            if (bounds.contains(marker.getLatLng())) {
-                selectedDrops.push(marker); // Add to selection
-                marker.setStyle({ color: 'blue' }); // Highlight
-            } else {
-                marker.setStyle({ color: 'red' }); // Reset others
-            }
-        });
-    }
-});
-
-// Mouse up event
-map.on('mouseup', function(e) {
-    // Finish selection with the right mouse button (button 2)
-    if (isSelecting && selectionBox && e.originalEvent.button === 2) {
-        map.removeLayer(selectionBox);
-        selectionBox = null;
-        isSelecting = false; // Reset selection mode
-        map.dragging.enable(); // Re-enable map dragging
-        // Assign the selected drops to a run number
-        assignDropsToRun(selectedDrops);
-    }
-});
-
-// Function to assign drops to a run
-function assignDropsToRun(selectedDrops) {
-    const runNumber = prompt("Enter run number:");
-    if (runNumber) {
-        // Send selectedDrops and runNumber to the backend using AJAX
-        const dropIds = selectedDrops.map(marker => marker.options.id); // Assuming markers have an 'id' option
-        $.ajax({
-            url: 'your_backend_endpoint', // Replace with your backend endpoint
-            method: 'POST',
-            data: {
-                runNumber: runNumber,
-                drops: dropIds
-            },
-            success: function(response) {
-                alert('Drops assigned successfully!');
-                // Handle success response
-            },
-            error: function(error) {
-                alert('Error assigning drops.');
-                // Handle error response
-            }
-        });
-    }
-});
-
-// Context menu event to disable right-click context menu
-map.on('contextmenu', function(e) {
-    e.originalEvent.preventDefault(); // Prevent default context menu
-});
