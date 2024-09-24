@@ -81,8 +81,10 @@ function uploadSpreadsheet() {
 function setupSelectionFeature() {
     // Mouse down event
     map.on('mousedown', function(e) {
-        if (e.originalEvent.button === 2) { // Right mouse button
-            e.preventDefault(); // Prevent context menu from appearing
+        // Use the original mouse event
+        const originalEvent = e.originalEvent;
+        if (originalEvent.button === 2) { // Right mouse button
+            originalEvent.preventDefault(); // Prevent context menu from appearing
             startPoint = e.latlng;
             selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 });
             map.addLayer(selectionBox);
@@ -110,7 +112,8 @@ function setupSelectionFeature() {
 
     // Mouse up event
     map.on('mouseup', function(e) {
-        if (isSelecting && selectionBox && e.originalEvent.button === 2) { // Right mouse button
+        const originalEvent = e.originalEvent;
+        if (isSelecting && selectionBox && originalEvent.button === 2) { // Right mouse button
             map.removeLayer(selectionBox);
             selectionBox = null;
             isSelecting = false; // Reset selection mode
