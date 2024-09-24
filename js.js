@@ -10,6 +10,7 @@ let selectedDrops = [];
 let selectionBox = null;
 let startPoint = null;
 let isSelecting = false;
+let markers = []; // Array to hold marker references
 
 // Load map markers when DOM content is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -96,15 +97,6 @@ function setupSelectionFeature() {
         if (isSelecting && selectionBox) {
             const bounds = L.latLngBounds(startPoint, e.latlng);
             selectionBox.setBounds(bounds);
-            selectedDrops = []; // Reset selection on new move
-            markers.forEach(marker => {
-                if (bounds.contains(marker.getLatLng())) {
-                    selectedDrops.push(marker); // Add to selection
-                    marker.setStyle({ color: 'blue' }); // Highlight
-                } else {
-                    marker.setStyle({ color: 'red' }); // Reset others
-                }
-            });
         }
     });
 
@@ -115,7 +107,9 @@ function setupSelectionFeature() {
             selectionBox = null;
             isSelecting = false; // Reset selection mode
             map.dragging.enable(); // Re-enable map dragging
-            assignDropsToRun(selectedDrops);
+            
+            // Highlight selected markers
+            highlightSelectedMarkers();
         }
     });
 
@@ -123,6 +117,29 @@ function setupSelectionFeature() {
     map.on('contextmenu', function(e) {
         e.originalEvent.preventDefault(); // Prevent default context menu
     });
+}
+
+// Function to highlight selected markers
+function highlightSelectedMarkers() {
+    const bounds = selectionBox.getBounds(); // Get the bounds of the selection box
+    selectedDrops = []; // Reset selected drops
+
+    markers.forEach(marker => {
+        if (bounds.contains(marker.getLatLng())) {
+            selectedDrops.push(marker); // Add to selected drops
+            marker.setStyle({ color: 'blue' }); // Highlight selected markers
+            marker.setOpacity(1); // Ensure selected markers are fully opaque
+        } else {
+            marker.setStyle({ color: 'red' }); // Reset others
+            marker.setOpacity(0.6); // Dim unselected markers
+        }
+    });
+
+    if (selectedDrops.length > 0) {
+        console.log(`Selected drops: ${selectedDrops.length}`);
+    } else {
+        console.log('No drops selected.');
+    }
 }
 
 // Function to assign drops to a run
@@ -149,7 +166,6 @@ function assignDropsToRun(selectedDrops) {
         });
     }
 }
-
 
 // Function to animate loading dots
 function animateLoadingDots() {
@@ -182,6 +198,7 @@ function loadMapMarkers() {
             });
 
             // Add markers to the map
+            markers = []; // Reset markers array
             locations.forEach(location => {
                 if (location.latitude && location.longitude) {
                     var marker = L.marker([location.latitude, location.longitude]).addTo(map);
@@ -219,6 +236,8 @@ function loadMapMarkers() {
                         });
                         marker.setIcon(dropIcon);
                     }
+
+                    markers.push(marker); // Store marker reference
                 } else {
                     console.error('Location missing coordinates:', location);
                 }
@@ -226,6 +245,9 @@ function loadMapMarkers() {
         })
         .catch(err => console.error('Error fetching locations:', err));
 }
+
+// Remaining functions remain unchanged
+
 
 
 // Function to assign a drop number
