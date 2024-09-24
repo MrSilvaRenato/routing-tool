@@ -83,7 +83,7 @@ function setupSelectionFeature() {
     // Mouse down event
     map.on('mousedown', function(e) {
         if (e.originalEvent.button === 2) { // Right mouse button
-            e.preventDefault(); // Prevent context menu from appearing
+            e.originalEvent.preventDefault(); // Prevent context menu from appearing
             startPoint = e.latlng;
             selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 });
             map.addLayer(selectionBox);
