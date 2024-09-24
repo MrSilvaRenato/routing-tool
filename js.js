@@ -5,7 +5,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-
 // Load map markers when DOM content is loaded
 document.addEventListener('DOMContentLoaded', function() {
     loadMapMarkers();
@@ -77,6 +76,28 @@ let selectionBox; // Variable for selection box
 let startPoint; // Starting point for the selection
 let isSelecting = false; // Track whether selection is in progress
 let markers = []; // Array to store markers
+
+// Function to load map markers (make sure to populate the markers array)
+function loadMapMarkers() {
+    // Clear existing markers
+    markers.forEach(marker => {
+        map.removeLayer(marker); // Remove from map
+    });
+    markers = []; // Clear markers array
+
+    // Example: Replace with actual loading logic from your database
+    const markerData = [
+        { lat: -27.4698, lng: 153.0251 },
+        { lat: -27.4800, lng: 153.0200 },
+        // Add more marker data as needed
+    ];
+
+    markerData.forEach(data => {
+        const marker = L.circleMarker([data.lat, data.lng], { color: 'blue', fillOpacity: 0.5 });
+        marker.addTo(map);
+        markers.push(marker); // Store the marker instance
+    });
+}
 
 // Function to set up selection feature on the map
 function setupSelectionFeature() {
