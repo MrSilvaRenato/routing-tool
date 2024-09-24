@@ -77,11 +77,13 @@ function uploadSpreadsheet() {
     });
 }
 
+// Ensure you have this array declared and populated when loading markers
+let markers = []; // This should be populated when loading your map markers
+
 // Function to set up selection feature on the map
 function setupSelectionFeature() {
     // Mouse down event
     map.on('mousedown', function(e) {
-        // Use the original mouse event
         const originalEvent = e.originalEvent;
         if (originalEvent.button === 2) { // Right mouse button
             originalEvent.preventDefault(); // Prevent context menu from appearing
@@ -99,14 +101,16 @@ function setupSelectionFeature() {
             const bounds = L.latLngBounds(startPoint, e.latlng);
             selectionBox.setBounds(bounds);
             selectedDrops = []; // Reset selection on new move
-            markers.forEach(marker => {
-                if (bounds.contains(marker.getLatLng())) {
-                    selectedDrops.push(marker); // Add to selection
-                    marker.setStyle({ color: 'blue' }); // Highlight
-                } else {
-                    marker.setStyle({ color: 'red' }); // Reset others
-                }
-            });
+            if (markers) { // Check if markers are defined
+                markers.forEach(marker => {
+                    if (bounds.contains(marker.getLatLng())) {
+                        selectedDrops.push(marker); // Add to selection
+                        marker.setStyle({ color: 'blue' }); // Highlight
+                    } else {
+                        marker.setStyle({ color: 'red' }); // Reset others
+                    }
+                });
+            }
         }
     });
 
@@ -132,11 +136,35 @@ function setupSelectionFeature() {
 function assignDropsToRun(selectedDrops) {
     const runNumber = prompt("Enter run number:");
     if (runNumber) {
+        // Send selectedDrops and runNumber to the backend using AJAX
         const dropIds = selectedDrops.map(marker => marker.options.id); // Assuming markers have an 'id' option
-        // For demonstration, show an alert with run number and selected drop IDs
-        alert(`Run Number: ${runNumber}\nSelected Drops: ${dropIds.join(', ')}`);
-        // Here you would send the selectedDrops and runNumber to your backend using AJAX
-        // Implement your AJAX request here as needed
+        $.ajax({
+            url: 'your_backend_endpoint', // Replace with your backend endpoint
+            method: 'POST',
+            data: {
+                runNumber: runNumber,
+                drops: dropIds
+            },
+            success: function(response) {
+                alert('Drops assigned successfully!');
+                // Reset styles after successful assignment
+                selectedDrops.forEach(marker => {
+                    marker.setStyle({ color: 'green' }); // Change to a new color to indicate assigned
+                });
+                // Clear selectedDrops after assigning
+                selectedDrops = [];
+            },
+            error: function(error) {
+                alert('Error assigning drops.');
+                // Handle error response
+            }
+        });
+    } else {
+        // Clear styles if no run number is entered
+        selectedDrops.forEach(marker => {
+            marker.setStyle({ color: 'red' }); // Reset color if no assignment is made
+        });
+        selectedDrops = [];
     }
 }
 
