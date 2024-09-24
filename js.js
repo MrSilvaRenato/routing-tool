@@ -310,3 +310,67 @@ function getDistance(origin, destination) {
     var distance = R * c; // in metres
     return distance;
 }
+
+let selectedDrops = [];
+let selectionBox;
+let startPoint;
+
+// Mouse down event
+map.on('mousedown', function(e) {
+    startPoint = e.latlng;
+    selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 });
+    map.addLayer(selectionBox);
+});
+
+// Mouse move event
+map.on('mousemove', function(e) {
+    if (selectionBox) {
+        const bounds = L.latLngBounds(startPoint, e.latlng);
+        selectionBox.setBounds(bounds);
+        selectedDrops = []; // Reset selection on new move
+        markers.forEach(marker => {
+            if (bounds.contains(marker.getLatLng())) {
+                selectedDrops.push(marker); // Add to selection
+                marker.setStyle({ color: 'blue' }); // Highlight
+            } else {
+                marker.setStyle({ color: 'red' }); // Reset others
+            }
+        });
+    }
+});
+
+// Mouse up event
+map.on('mouseup', function() {
+    if (selectionBox) {
+        map.removeLayer(selectionBox);
+        selectionBox = null;
+        // Here you can add a function to assign the selected drops to a run number
+        assignDropsToRun(selectedDrops);
+    }
+});
+
+// Function to assign drops to a run
+function assignDropsToRun(selectedDrops) {
+    const runNumber = prompt("Enter run number:");
+    if (runNumber) {
+        // Send selectedDrops and runNumber to the backend using AJAX
+        // Implement your AJAX request here
+        const dropIds = selectedDrops.map(marker => marker.options.id); // Assuming markers have an 'id' option
+        $.ajax({
+            url: 'your_backend_endpoint', // Replace with your backend endpoint
+            method: 'POST',
+            data: {
+                runNumber: runNumber,
+                drops: dropIds
+            },
+            success: function(response) {
+                alert('Drops assigned successfully!');
+                // Handle success response
+            },
+            error: function(error) {
+                alert('Error assigning drops.');
+                // Handle error response
+            }
+        });
+    }
+}
