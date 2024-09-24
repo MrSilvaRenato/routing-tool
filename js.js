@@ -63,7 +63,7 @@ function uploadSpreadsheet() {
         const messageDiv = document.getElementById('message');
         loadingMessage.style.display = 'none'; // Hide loading message
         messageDiv.textContent = 'Error uploading spreadsheet.';
-        messageDiv.style.color = 'red';
+        messageDiv.style.color = 'red';;
     });
 }
 
