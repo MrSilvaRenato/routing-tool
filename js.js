@@ -5,6 +5,9 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+// Ensure you have this array declared and populated when loading markers
+let markers = []; // This should be populated when loading your map markers
+
 // Variables for selection
 let selectedDrops = [];
 let selectionBox = null;
@@ -28,57 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSelectionFeature();
 });
 
-// Function to handle spreadsheet upload
-function uploadSpreadsheet() {
-    const formData = new FormData(document.getElementById('uploadForm')); // Get the form data
-
-    // Show loading message
-    const loadingMessage = document.getElementById('loadingMessage');
-    loadingMessage.style.display = 'block';
-    animateLoadingDots();
-
-    fetch('upload.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(result => {
-        const messageDiv = document.getElementById('message');
-        loadingMessage.style.display = 'none'; // Hide loading message
-
-        // Clear previous errors
-        const errorDiv = document.getElementById('errorMessages');
-        errorDiv.innerHTML = '';
-
-        if (result.message) {
-            messageDiv.textContent = result.message;
-            messageDiv.style.color = 'green';
-            loadMapMarkers(); // Refresh markers after upload
-        } else if (result.error) {
-            messageDiv.textContent = 'Error: ' + result.error;
-            messageDiv.style.color = 'red';
-        }
-
-        // Display any upload errors
-        if (result.errors && result.errors.length > 0) {
-            result.errors.forEach(error => {
-                const errorItem = document.createElement('div');
-                errorItem.textContent = `Address error, this was not uploaded: ${error.address} - Reason: ${error.reason}`;
-                errorDiv.appendChild(errorItem);
-            });
-        }
-    })
-    .catch(err => {
-        console.error('Error uploading spreadsheet:', err);
-        const messageDiv = document.getElementById('message');
-        loadingMessage.style.display = 'none'; // Hide loading message
-        messageDiv.textContent = 'Error uploading spreadsheet.';
-        messageDiv.style.color = 'red';
-    });
-}
-
-let markers = []; // This should be populated when loading your map markers
-
 // Function to set up selection feature on the map
 function setupSelectionFeature() {
     // Mouse down event
@@ -100,34 +52,17 @@ function setupSelectionFeature() {
             const bounds = L.latLngBounds(startPoint, e.latlng);
             selectionBox.setBounds(bounds);
             selectedDrops = []; // Reset selection on new move
-            if (markers) { // Check if markers are defined
-                markers.forEach(marker => {
-                    if (bounds.contains(marker.getLatLng())) {
-                        selectedDrops.push(marker); // Add to selection
-                        // Apply styles for selected markers
-                        marker.setStyle({ 
-                            color: 'rgba(0, 0, 255, 0.5)', // Blue background with transparency
-                            radius: 8, // Set the radius for the circle
-                            fillColor: 'rgba(0, 0, 255, 0.5)', // Fill color
-                            fillOpacity: 0.5 // Background opacity
-                        });
-                        // Change text color to white
-                        if (marker._icon) {
-                            marker._icon.style.color = 'white'; // Assuming markers have a text/icon property
-                        }
-                    } else {
-                        // Reset styles for unselected markers
-                        marker.setStyle({ 
-                            color: 'red',
-                            fillColor: 'red', 
-                            fillOpacity: 0.5 
-                        });
-                        if (marker._icon) {
-                            marker._icon.style.color = 'black'; // Reset text color
-                        }
-                    }
-                });
-            }
+            markers.forEach(marker => {
+                if (bounds.contains(marker.getLatLng())) {
+                    selectedDrops.push(marker); // Add to selection
+                    // Highlight the marker with a blue background and white text
+                    marker.setStyle({ color: 'blue', fillColor: 'rgba(0, 0, 255, 0.5)', fillOpacity: 0.5 });
+                    marker.bindTooltip(marker.options.title, { permanent: true, direction: 'top', className: 'marker-tooltip' }).openOn(map);
+                } else {
+                    // Reset styles for unselected markers
+                    marker.setStyle({ color: 'red', fillColor: 'rgba(255, 255, 255, 0)', fillOpacity: 0 });
+                }
+            });
         }
     });
 
@@ -139,7 +74,6 @@ function setupSelectionFeature() {
             selectionBox = null;
             isSelecting = false; // Reset selection mode
             map.dragging.enable(); // Re-enable map dragging
-            assignDropsToRun(selectedDrops); // Assign drops after selection
         }
     });
 
@@ -147,47 +81,6 @@ function setupSelectionFeature() {
     map.on('contextmenu', function(e) {
         e.originalEvent.preventDefault(); // Prevent default context menu
     });
-}
-
-// Function to assign drops to a run
-function assignDropsToRun(selectedDrops) {
-    // Instead of prompting for a run number, you could directly handle the selection
-    // Assuming you'll implement your own method to select run numbers without an alert.
-    const runNumber = "SomeRunNumber"; // Replace with your logic for run number selection
-
-    if (runNumber) {
-        // Send selectedDrops and runNumber to the backend using AJAX
-        const dropIds = selectedDrops.map(marker => marker.options.id); // Assuming markers have an 'id' option
-        $.ajax({
-            url: 'your_backend_endpoint', // Replace with your backend endpoint
-            method: 'POST',
-            data: {
-                runNumber: runNumber,
-                drops: dropIds
-            },
-            success: function(response) {
-                // Reset styles after successful assignment
-                selectedDrops.forEach(marker => {
-                    marker.setStyle({ color: 'green' }); // Change to a new color to indicate assigned
-                });
-                // Clear selectedDrops after assigning
-                selectedDrops = [];
-            },
-            error: function(error) {
-                console.error('Error assigning drops:', error);
-                // Handle error response
-            }
-        });
-    } else {
-        // Clear styles if no run number is entered
-        selectedDrops.forEach(marker => {
-            marker.setStyle({ color: 'red', fillColor: 'red', fillOpacity: 0.5 }); // Reset color if no assignment is made
-            if (marker._icon) {
-                marker._icon.style.color = 'black'; // Reset text color if no assignment
-            }
-        });
-        selectedDrops = [];
-    }
 }
 
 
