@@ -47,6 +47,8 @@
                 </div>
                 <button type="submit" class="btn btn-primary mb-2">Upload</button>
                 <button type="button" id="deleteAllBtn" class="btn btn-danger mb-2 ml-2" onclick="deleteAllRecords()">Delete All</button>
+                <button type="button" id="optimizeDropsBtn" class="btn btn-success">Optimize Drops</button>
+
             </form>
            
         </div>

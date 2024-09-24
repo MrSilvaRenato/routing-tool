@@ -221,3 +221,49 @@ document.getElementById('customFile').addEventListener('change', function(event)
     var label = event.target.nextElementSibling;
     label.textContent = event.target.files[0] ? event.target.files[0].name : 'Choose file';
 });
+
+document.getElementById('optimizeDropsBtn').addEventListener('click', optimizeDrops);
+
+function optimizeDrops() {
+    const origin = [ -27.4655, 153.0586 ]; // Coordinates for 470 Lytton Road, Morningside
+
+    fetch('get_deliveries.php') // Assuming this returns a list of delivery locations with coordinates
+        .then(response => response.json())
+        .then(deliveries => {
+            // Calculate distances from the origin
+            deliveries.forEach(delivery => {
+                delivery.distance = calculateDistance(origin, [delivery.latitude, delivery.longitude]);
+            });
+
+            // Sort deliveries by distance
+            deliveries.sort((a, b) => a.distance - b.distance);
+
+            // Assign drop numbers
+            deliveries.forEach((delivery, index) => {
+                delivery.drop_number = index + 1; // Drop 1, Drop 2, etc.
+                assignDrop(delivery.delivery_id, delivery.drop_number); // Update in DB
+            });
+
+            alert('Drops have been optimized!');
+            loadMapMarkers(); // Refresh the map to reflect new drop numbers
+        })
+        .catch(error => console.error('Error optimizing drops:', error));
+}
+
+// Function to calculate distance between two coordinates using Haversine formula
+function calculateDistance(coord1, coord2) {
+    const R = 6371; // Radius of the Earth in km
+    const lat1 = coord1[0] * Math.PI / 180;
+    const lon1 = coord1[1] * Math.PI / 180;
+    const lat2 = coord2[0] * Math.PI / 180;
+    const lon2 = coord2[1] * Math.PI / 180;
+    const dlat = lat2 - lat1;
+    const dlon = lon2 - lon1;
+
+    const a = Math.sin(dlat / 2) * Math.sin(dlat / 2) +
+              Math.cos(lat1) * Math.cos(lat2) * 
+              Math.sin(dlon / 2) * Math.sin(dlon / 2);
+    
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+}
