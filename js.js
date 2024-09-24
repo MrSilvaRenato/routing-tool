@@ -5,9 +5,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Ensure you have this array declared and populated when loading markers
-let markers = []; // This should be populated when loading your map markers
-
 // Variables for selection
 let selectedDrops = [];
 let selectionBox = null;
@@ -16,13 +13,154 @@ let isSelecting = false;
 
 // Load map markers when DOM content is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    loadMapMarkers(); // Load markers from the spreadsheet
+    loadMapMarkers();
+
+    // Prevent default form submission and handle file upload
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent page reload
+        uploadSpreadsheet(); // Call without passing event
+    });
+
+    // Load markers every 30 seconds
+    setInterval(loadMapMarkers, 30000);
 
     // Set up map event listeners for selection feature
     setupSelectionFeature();
 });
 
-// Function to load markers from the spreadsheet
+// Function to handle spreadsheet upload
+function uploadSpreadsheet() {
+    const formData = new FormData(document.getElementById('uploadForm')); // Get the form data
+
+    // Show loading message
+    const loadingMessage = document.getElementById('loadingMessage');
+    loadingMessage.style.display = 'block';
+    animateLoadingDots();
+
+    fetch('upload.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+        const messageDiv = document.getElementById('message');
+        loadingMessage.style.display = 'none'; // Hide loading message
+
+        // Clear previous errors
+        const errorDiv = document.getElementById('errorMessages');
+        errorDiv.innerHTML = '';
+
+        if (result.message) {
+            messageDiv.textContent = result.message;
+            messageDiv.style.color = 'green';
+            loadMapMarkers(); // Refresh markers after upload
+        } else if (result.error) {
+            messageDiv.textContent = 'Error: ' + result.error;
+            messageDiv.style.color = 'red';
+        }
+
+        // Display any upload errors
+        if (result.errors && result.errors.length > 0) {
+            result.errors.forEach(error => {
+                const errorItem = document.createElement('div');
+                errorItem.textContent = `Address error, this was not uploaded: ${error.address} - Reason: ${error.reason}`;
+                errorDiv.appendChild(errorItem);
+            });
+        }
+    })
+    .catch(err => {
+        console.error('Error uploading spreadsheet:', err);
+        const messageDiv = document.getElementById('message');
+        loadingMessage.style.display = 'none'; // Hide loading message
+        messageDiv.textContent = 'Error uploading spreadsheet.';
+        messageDiv.style.color = 'red';
+    });
+}
+
+// Function to set up selection feature on the map
+function setupSelectionFeature() {
+    // Mouse down event
+    map.on('mousedown', function(e) {
+        if (e.originalEvent.button === 2) { // Right mouse button
+            e.preventDefault(); // Prevent context menu from appearing
+            startPoint = e.latlng;
+            selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 });
+            map.addLayer(selectionBox);
+            isSelecting = true; // Set selection mode
+            map.dragging.disable(); // Disable map dragging while selecting
+        }
+    });
+
+    // Mouse move event
+    map.on('mousemove', function(e) {
+        if (isSelecting && selectionBox) {
+            const bounds = L.latLngBounds(startPoint, e.latlng);
+            selectionBox.setBounds(bounds);
+            selectedDrops = []; // Reset selection on new move
+            markers.forEach(marker => {
+                if (bounds.contains(marker.getLatLng())) {
+                    selectedDrops.push(marker); // Add to selection
+                    marker.setStyle({ color: 'blue' }); // Highlight
+                } else {
+                    marker.setStyle({ color: 'red' }); // Reset others
+                }
+            });
+        }
+    });
+
+    // Mouse up event
+    map.on('mouseup', function(e) {
+        if (isSelecting && selectionBox && e.originalEvent.button === 2) { // Right mouse button
+            map.removeLayer(selectionBox);
+            selectionBox = null;
+            isSelecting = false; // Reset selection mode
+            map.dragging.enable(); // Re-enable map dragging
+            assignDropsToRun(selectedDrops);
+        }
+    });
+
+    // Context menu event to disable right-click context menu
+    map.on('contextmenu', function(e) {
+        e.originalEvent.preventDefault(); // Prevent default context menu
+    });
+}
+
+// Function to assign drops to a run
+function assignDropsToRun(selectedDrops) {
+    const runNumber = prompt("Enter run number:");
+    if (runNumber) {
+        // Send selectedDrops and runNumber to the backend using AJAX
+        const dropIds = selectedDrops.map(marker => marker.options.id); // Assuming markers have an 'id' option
+        $.ajax({
+            url: 'your_backend_endpoint', // Replace with your backend endpoint
+            method: 'POST',
+            data: {
+                runNumber: runNumber,
+                drops: dropIds
+            },
+            success: function(response) {
+                alert('Drops assigned successfully!');
+                // Handle success response
+            },
+            error: function(error) {
+                alert('Error assigning drops.');
+                // Handle error response
+            }
+        });
+    }
+}
+
+
+// Function to animate loading dots
+function animateLoadingDots() {
+    const loadingDots = document.getElementById('loadingDots');
+    let dotCount = 0;
+    setInterval(() => {
+        dotCount = (dotCount + 1) % 4; // Cycle through 0 to 3
+        loadingDots.textContent = '.'.repeat(dotCount); // Update dots
+    }, 500); // Change dots every 500ms
+}
+
 function loadMapMarkers() {
     fetch('get_deliveries.php') // Fetch deliveries from the server
         .then(response => {
@@ -38,7 +176,7 @@ function loadMapMarkers() {
 
             // Clear existing markers before adding new ones
             map.eachLayer(function(layer) {
-                if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
+                if (layer instanceof L.Marker) {
                     map.removeLayer(layer);
                 }
             });
@@ -46,31 +184,26 @@ function loadMapMarkers() {
             // Add markers to the map
             locations.forEach(location => {
                 if (location.latitude && location.longitude) {
-                    var marker = L.circleMarker([location.latitude, location.longitude], {
-                        color: 'red', radius: 8, fill: true, fillColor: 'rgba(255, 255, 255, 0)', fillOpacity: 0
-                    });
-                    marker.options.id = location.delivery_id; // Set a unique ID for the marker
-                    markers.push(marker); // Add to markers array
-                    marker.addTo(map); // Add marker to the map
+                    var marker = L.marker([location.latitude, location.longitude]).addTo(map);
 
                     // Popup content with drop number input field, assign drop button, and delete record button
                     var popupContent = `
-                        <div class="popup-content">
-                            <strong>Address:</strong><br>
-                            <span>${location.street_number} ${location.street_name}</span><br>
-                            <span>${location.suburb}, ${location.city}</span><br><br>
-                            
-                            <div class="form-group">
-                                <label for="dropNumber${location.delivery_id}">Drop Number:</label>
-                                <input type="number" class="form-control" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
-                            </div>
-                            
-                            <div class="d-flex justify-content-between">
-                                <button class="btn btn-success" onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
-                                <button class="btn btn-danger" onclick="deleteRecord('${location.delivery_id}')">Delete Record</button>
-                            </div>
+                    <div class="popup-content">
+                        <strong>Address:</strong><br>
+                        <span>${location.street_number} ${location.street_name}</span><br>
+                        <span>${location.suburb}, ${location.city}</span><br><br>
+                        
+                        <div class="form-group">
+                            <label for="dropNumber${location.delivery_id}">Drop Number:</label>
+                            <input type="number" class="form-control" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
                         </div>
-                    `;
+                        
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-success" onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
+                            <button class="btn btn-danger" onclick="deleteRecord('${location.delivery_id}')">Delete Record</button>
+                        </div>
+                    </div>
+                `;
                     marker.bindPopup(popupContent).openPopup();
 
                     // Show drop number on the marker if assigned
@@ -79,8 +212,8 @@ function loadMapMarkers() {
                         var dropIcon = L.divIcon({
                             className: 'drop-icon',
                             html: `<div style="color: red; font-size: 20px; font-weight: bold; text-align: center;">
-                                ${dropLabel}
-                            </div>`,
+                            ${dropLabel}
+                        </div>`,
                             iconSize: [30, 42],
                             popupAnchor: [0, -30]
                         });
@@ -94,73 +227,6 @@ function loadMapMarkers() {
         .catch(err => console.error('Error fetching locations:', err));
 }
 
-// Function to set up selection feature on the map
-function setupSelectionFeature() {
-    // Mouse down event
-    map.on('mousedown', function(e) {
-        const originalEvent = e.originalEvent;
-        if (originalEvent.button === 2) { // Right mouse button
-            originalEvent.preventDefault(); // Prevent context menu from appearing
-            startPoint = e.latlng;
-            selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 });
-            map.addLayer(selectionBox);
-            isSelecting = true; // Set selection mode
-            map.dragging.disable(); // Disable map dragging while selecting
-        }
-    });
-
-    // Mouse move event
-    map.on('mousemove', function(e) {
-        if (isSelecting && selectionBox) {
-            const bounds = L.latLngBounds(startPoint, e.latlng);
-            selectionBox.setBounds(bounds);
-            selectedDrops = []; // Reset selection on new move
-            
-            // Highlight markers within the selection bounds
-            markers.forEach(marker => {
-                if (bounds.contains(marker.getLatLng())) {
-                    selectedDrops.push(marker); // Add to selection
-                    // Highlight the marker with a blue background and white text
-                    marker.setStyle({ color: 'blue', fillColor: 'rgba(0, 0, 255, 0.5)', fillOpacity: 0.5 });
-                } else {
-                    // Reset styles for unselected markers
-                    marker.setStyle({ color: 'red', fillColor: 'rgba(255, 255, 255, 0)', fillOpacity: 0 });
-                }
-            });
-        }
-    });
-
-    // Mouse up event
-    map.on('mouseup', function(e) {
-        const originalEvent = e.originalEvent;
-        if (isSelecting && selectionBox && originalEvent.button === 2) { // Right mouse button
-            map.removeLayer(selectionBox);
-            selectionBox = null;
-            isSelecting = false; // Reset selection mode
-            map.dragging.enable(); // Re-enable map dragging
-            
-            // After selection, keep selected markers highlighted
-            selectedDrops.forEach(marker => {
-                marker.setStyle({ color: 'blue', fillColor: 'rgba(0, 0, 255, 0.5)', fillOpacity: 0.5 });
-            });
-        }
-    });
-
-    // Context menu event to disable right-click context menu
-    map.on('contextmenu', function(e) {
-        e.originalEvent.preventDefault(); // Prevent default context menu
-    });
-}
-
-// Function to animate loading dots
-function animateLoadingDots() {
-    const loadingDots = document.getElementById('loadingDots');
-    let dotCount = 0;
-    setInterval(() => {
-        dotCount = (dotCount + 1) % 4; // Cycle through 0 to 3
-        loadingDots.textContent = '.'.repeat(dotCount); // Update dots
-    }, 500); // Change dots every 500ms
-}
 
 // Function to assign a drop number
 function assignDrop(deliveryId) {
@@ -247,7 +313,6 @@ function deleteRecord(deliveryId) {
         .catch(err => console.error('Error deleting record:', err));
     }
 }
-
 
 // Update the file input label on file selection
 document.getElementById('customFile').addEventListener('change', function(event) {
