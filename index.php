@@ -31,7 +31,17 @@
 
         .popup-content button {
             margin-top: 10px; /* Space above buttons */
-    }
+        }
+
+        /* Ensure custom file input works with Bootstrap */
+        .custom-file-label::after {
+            content: "Browse"; /* Display proper 'Browse' text */
+        }
+
+        /* Adjust the spacing for buttons */
+        #deleteAllBtn, #optimizeDropsBtn {
+            margin-left: 10px; /* Space between buttons */
+        }
 </style>
     </style>
 </head>
