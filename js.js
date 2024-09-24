@@ -222,48 +222,77 @@ document.getElementById('customFile').addEventListener('change', function(event)
     label.textContent = event.target.files[0] ? event.target.files[0].name : 'Choose file';
 });
 
-document.getElementById('optimizeDropsBtn').addEventListener('click', optimizeDrops);
+
 
 function optimizeDrops() {
-    const origin = [ -27.4655, 153.0586 ]; // Coordinates for 470 Lytton Road, Morningside
+    var origin = { lat: -27.4664, lng: 153.0881 }; // 470 Lytton Road coordinates
 
-    fetch('get_deliveries.php') // Assuming this returns a list of delivery locations with coordinates
+    fetch('get_deliveries.php')
         .then(response => response.json())
-        .then(deliveries => {
-            // Calculate distances from the origin
-            deliveries.forEach(delivery => {
-                delivery.distance = calculateDistance(origin, [delivery.latitude, delivery.longitude]);
-            });
+        .then(locations => {
+            if (locations && locations.length > 0) {
+                // Calculate distances from the origin
+                locations.forEach(location => {
+                    var distance = getDistance(origin, {
+                        lat: parseFloat(location.latitude),
+                        lng: parseFloat(location.longitude)
+                    });
+                    location.distance = distance; // Add distance property to each location
+                });
 
-            // Sort deliveries by distance
-            deliveries.sort((a, b) => a.distance - b.distance);
+                // Sort by distance (closest first)
+                locations.sort((a, b) => a.distance - b.distance);
 
-            // Assign drop numbers
-            deliveries.forEach((delivery, index) => {
-                delivery.drop_number = index + 1; // Drop 1, Drop 2, etc.
-                assignDrop(delivery.delivery_id, delivery.drop_number); // Update in DB
-            });
+                // Automatically assign drop numbers based on sorted locations
+                locations.forEach((location, index) => {
+                    var dropNumber = index + 1; // Drop 1, Drop 2, etc.
+                    console.log(`Optimizing drop ${dropNumber} for delivery ID: ${location.delivery_id}`);
 
-            alert('Drops have been optimized!');
-            loadMapMarkers(); // Refresh the map to reflect new drop numbers
+                    // Send the drop number to the server
+                    var formData = new FormData();
+                    formData.append('delivery_id', location.delivery_id);
+                    formData.append('drop_number', dropNumber);
+
+                    fetch('update.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            console.log(`Drop ${dropNumber} assigned to delivery ID: ${location.delivery_id}`);
+                            loadMapMarkers(); // Reload markers after optimizing drops
+                        } else {
+                            console.error(`Error optimizing drop for delivery ID: ${location.delivery_id}`);
+                        }
+                    })
+                    .catch(err => console.error(`Error optimizing drop for delivery ID: ${location.delivery_id}`, err));
+                });
+            } else {
+                console.error('No deliveries found to optimize.');
+            }
         })
         .catch(error => console.error('Error optimizing drops:', error));
 }
 
-// Function to calculate distance between two coordinates using Haversine formula
-function calculateDistance(coord1, coord2) {
-    const R = 6371; // Radius of the Earth in km
-    const lat1 = coord1[0] * Math.PI / 180;
-    const lon1 = coord1[1] * Math.PI / 180;
-    const lat2 = coord2[0] * Math.PI / 180;
-    const lon2 = coord2[1] * Math.PI / 180;
-    const dlat = lat2 - lat1;
-    const dlon = lon2 - lon1;
+// Helper function to calculate distance between two coordinates
+function getDistance(origin, destination) {
+    var lat1 = origin.lat;
+    var lon1 = origin.lng;
+    var lat2 = destination.lat;
+    var lon2 = destination.lng;
 
-    const a = Math.sin(dlat / 2) * Math.sin(dlat / 2) +
-              Math.cos(lat1) * Math.cos(lat2) * 
-              Math.sin(dlon / 2) * Math.sin(dlon / 2);
-    
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
+    var R = 6371e3; // metres
+    var φ1 = lat1 * Math.PI/180; // φ, λ in radians
+    var φ2 = lat2 * Math.PI/180;
+    var Δφ = (lat2 - lat1) * Math.PI/180;
+    var Δλ = (lon2 - lon1) * Math.PI/180;
+
+    var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    var distance = R * c; // in metres
+    return distance;
 }

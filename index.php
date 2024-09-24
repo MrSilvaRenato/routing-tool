@@ -39,17 +39,17 @@
     <div class="container mt-5">
         
 
-        <div id="controls" class="d-flex justify-content-center my-3">
-            <form id="uploadForm" enctype="multipart/form-data" class="form-inline">
-                <div class="custom-file mb-2 mr-2">
-                    <input type="file" name="spreadsheet" accept=".xlsx, .xls, .csv" required class="custom-file-input" id="customFile">
-                    <label class="custom-file-label" for="customFile">Upload Manifest</label>
-                </div>
-                <button type="submit" class="btn btn-primary mb-2">Upload</button>
-                <button type="button" id="deleteAllBtn" class="btn btn-danger mb-2 ml-2" onclick="deleteAllRecords()">Delete All</button>
-                <button type="button" id="optimizeDropsBtn" class="btn btn-success mb-2 ml-2">Optimize Drops</button>
-
-            </form>
+    <div id="controls" class="d-flex justify-content-center my-3">
+    <!-- Flex container for form and buttons -->
+    <div class="d-flex align-items-center">
+        <!-- Upload form -->
+        <form id="uploadForm" enctype="multipart/form-data" class="form-inline">
+            <div class="custom-file mb-2 mr-2">
+                <input type="file" name="spreadsheet" accept=".xlsx, .xls, .csv" required class="custom-file-input" id="customFile">
+                <label class="custom-file-label" for="customFile">Upload Manifest</label>
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Upload</button>
+        </form>
            
         </div>
 
