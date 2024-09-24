@@ -121,27 +121,21 @@ function setupSelectionFeature() {
 
 // Function to highlight selected markers
 function highlightSelectedMarkers() {
-    const bounds = selectionBox.getBounds(); // Get the bounds of the selection box
-    selectedDrops = []; // Reset selected drops
+    const bounds = selectionBox ? selectionBox.getBounds() : null; // Get the bounds of the selection box
 
-    markers.forEach(marker => {
-        if (bounds.contains(marker.getLatLng())) {
-            selectedDrops.push(marker); // Add to selected drops
-            marker.setStyle({ color: 'blue' }); // Highlight selected markers
-            marker.setOpacity(1); // Ensure selected markers are fully opaque
-        } else {
-            marker.setStyle({ color: 'red' }); // Reset others
-            marker.setOpacity(0.6); // Dim unselected markers
-        }
-    });
-
-    if (selectedDrops.length > 0) {
-        console.log(`Selected drops: ${selectedDrops.length}`);
-    } else {
-        console.log('No drops selected.');
+    if (bounds) { // Ensure bounds are defined
+        markers.forEach(marker => {
+            // Check if the marker is within the bounds
+            if (bounds.contains(marker.getLatLng())) {
+                // Style the marker to indicate selection
+                marker.setStyle({ color: 'red', fillColor: 'red', fillOpacity: 0.5 });
+            } else {
+                // Reset the style for markers outside the selection
+                marker.setStyle({ color: 'blue', fillColor: 'blue', fillOpacity: 0.5 });
+            }
+        });
     }
 }
-
 // Function to assign drops to a run
 function assignDropsToRun(selectedDrops) {
     const runNumber = prompt("Enter run number:");
