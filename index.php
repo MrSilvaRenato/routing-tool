@@ -42,6 +42,24 @@
         #deleteAllBtn, #optimizeDropsBtn {
             margin-left: 10px; /* Space between buttons */
         }
+        .btn {
+    height: 38px; /* Adjust this height to match */
+}
+
+@media (max-width: 768px) {
+    #map {
+        height: 400px; /* Reduce map height for mobile screens */
+    }
+
+    .d-flex.align-items-center {
+        flex-direction: column; /* Stack the buttons vertically on smaller screens */
+    }
+
+    #deleteAllBtn, #optimizeDropsBtn {
+        margin-left: 0; /* Remove the margin when stacked vertically */
+        margin-top: 10px; /* Add some top margin */
+    }
+}
 </style>
     </style>
 </head>
