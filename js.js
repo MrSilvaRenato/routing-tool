@@ -148,6 +148,22 @@ function uploadSpreadsheet() {
 }
 
 // Function to set up selection feature on the map
+// Create default and selected icon for markers
+const defaultIcon = L.divIcon({
+    className: 'marker-icon',
+    html: `<div style="color: blue; font-size: 20px; font-weight: bold; text-align: center;">Normal</div>`,
+    iconSize: [30, 42],
+    popupAnchor: [0, -30]
+});
+
+const selectedIcon = L.divIcon({
+    className: 'marker-icon',
+    html: `<div style="color: red; font-size: 20px; font-weight: bold; text-align: center;">Selected</div>`,
+    iconSize: [30, 42],
+    popupAnchor: [0, -30]
+});
+
+// Function to set up selection feature on the map
 function setupSelectionFeature() {
     // Mouse down event
     map.on('mousedown', function(e) {
@@ -162,14 +178,10 @@ function setupSelectionFeature() {
     });
 
     // Mouse move event
-    map.on('mousedown', function(e) {
-        if (e.originalEvent.button === 2) { // Right mouse button
-            e.originalEvent.preventDefault(); // Prevent context menu from appearing
-            startPoint = e.latlng; // Get starting point
-            selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 }).addTo(map);
-            selectionBox.bringToFront(); // Ensure the selection box is on top
-            isSelecting = true; // Set selection mode
-            map.dragging.disable(); // Disable map dragging while selecting
+    map.on('mousemove', function(e) {
+        if (isSelecting && selectionBox) {
+            const bounds = L.latLngBounds(startPoint, e.latlng);
+            selectionBox.setBounds(bounds); // Update selection box bounds
         }
     });
 
@@ -194,31 +206,21 @@ function setupSelectionFeature() {
 
 // Function to highlight selected markers
 function highlightSelectedMarkers() {
-    const bounds = selectionBox ? selectionBox.getBounds() : null;
+    const bounds = selectionBox ? selectionBox.getBounds() : null; // Get the bounds of the selection box
 
     if (bounds) {
-        console.log("Selection Bounds: ", bounds);
+        console.log("Selection Bounds: ", bounds); // Debug: Log selection bounds
         markers.forEach(marker => {
-            console.log("Marker Position: ", marker.getLatLng());
+            console.log("Marker Position: ", marker.getLatLng()); // Debug: Log marker positions
 
             // Check if the marker is within the bounds
             if (bounds.contains(marker.getLatLng())) {
-                console.log("Marker Selected: ", marker.getLatLng());
+                console.log("Marker Selected: ", marker.getLatLng()); // Debug: Log selected marker
                 // Change the icon to indicate selection
-                marker.setIcon(L.divIcon({
-                    className: 'selected-marker',
-                    html: `<div style="color: red; font-size: 20px; font-weight: bold; text-align: center;">Selected</div>`,
-                    iconSize: [30, 42],
-                    popupAnchor: [0, -30]
-                }));
+                marker.setIcon(selectedIcon);
             } else {
                 // Reset the icon for markers outside the selection
-                marker.setIcon(L.divIcon({
-                    className: '',
-                    html: `<div style="color: blue; font-size: 20px; font-weight: bold; text-align: center;">Normal</div>`,
-                    iconSize: [30, 42],
-                    popupAnchor: [0, -30]
-                }));
+                marker.setIcon(defaultIcon);
             }
         });
     }
