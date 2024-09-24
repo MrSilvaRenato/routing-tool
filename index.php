@@ -81,6 +81,12 @@
         </div>
     </div>
 
+    <div id="loadingMessage" class="alert alert-info" style="display:none;">
+            Manifest is getting uploaded, please wait<span id="loadingDots">...</span>
+        </div>
+
+        <div id="message" class="my-3"></div>
+
     <!-- Map container with proper sizing -->
     <div id="map" class="w-100" style="height: 600px;"></div>
 </div>
