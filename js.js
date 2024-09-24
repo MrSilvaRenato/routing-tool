@@ -24,15 +24,74 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to load markers from the spreadsheet
 function loadMapMarkers() {
-    // Assuming you have logic here to load your markers into the markers array
-    // Example:
-    // markers.push(L.marker([lat, lng]).addTo(map));
+    fetch('get_deliveries.php') // Fetch deliveries from the server
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(locations => {
+            if (!Array.isArray(locations)) {
+                throw new Error('Expected an array of locations');
+            }
 
-    // Sample marker for demonstration; replace with your actual data
-    const sampleMarker = L.circleMarker([-27.4698, 153.0251], { color: 'red', radius: 8, fill: true, fillColor: 'rgba(255, 255, 255, 0)', fillOpacity: 0 });
-    sampleMarker.options.id = 1; // Set a unique ID for the marker
-    markers.push(sampleMarker); // Add to markers array
-    sampleMarker.addTo(map); // Add marker to the map
+            // Clear existing markers before adding new ones
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            // Add markers to the map
+            locations.forEach(location => {
+                if (location.latitude && location.longitude) {
+                    var marker = L.circleMarker([location.latitude, location.longitude], {
+                        color: 'red', radius: 8, fill: true, fillColor: 'rgba(255, 255, 255, 0)', fillOpacity: 0
+                    });
+                    marker.options.id = location.delivery_id; // Set a unique ID for the marker
+                    markers.push(marker); // Add to markers array
+                    marker.addTo(map); // Add marker to the map
+
+                    // Popup content with drop number input field, assign drop button, and delete record button
+                    var popupContent = `
+                        <div class="popup-content">
+                            <strong>Address:</strong><br>
+                            <span>${location.street_number} ${location.street_name}</span><br>
+                            <span>${location.suburb}, ${location.city}</span><br><br>
+                            
+                            <div class="form-group">
+                                <label for="dropNumber${location.delivery_id}">Drop Number:</label>
+                                <input type="number" class="form-control" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <button class="btn btn-success" onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
+                                <button class="btn btn-danger" onclick="deleteRecord('${location.delivery_id}')">Delete Record</button>
+                            </div>
+                        </div>
+                    `;
+                    marker.bindPopup(popupContent).openPopup();
+
+                    // Show drop number on the marker if assigned
+                    if (location.drop_number) {
+                        var dropLabel = `${location.drop_number}`;
+                        var dropIcon = L.divIcon({
+                            className: 'drop-icon',
+                            html: `<div style="color: red; font-size: 20px; font-weight: bold; text-align: center;">
+                                ${dropLabel}
+                            </div>`,
+                            iconSize: [30, 42],
+                            popupAnchor: [0, -30]
+                        });
+                        marker.setIcon(dropIcon);
+                    }
+                } else {
+                    console.error('Location missing coordinates:', location);
+                }
+            });
+        })
+        .catch(err => console.error('Error fetching locations:', err));
 }
 
 // Function to set up selection feature on the map
@@ -93,7 +152,6 @@ function setupSelectionFeature() {
     });
 }
 
-
 // Function to animate loading dots
 function animateLoadingDots() {
     const loadingDots = document.getElementById('loadingDots');
@@ -103,73 +161,6 @@ function animateLoadingDots() {
         loadingDots.textContent = '.'.repeat(dotCount); // Update dots
     }, 500); // Change dots every 500ms
 }
-
-function loadMapMarkers() {
-    fetch('get_deliveries.php') // Fetch deliveries from the server
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok: ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(locations => {
-            if (!Array.isArray(locations)) {
-                throw new Error('Expected an array of locations');
-            }
-
-            // Clear existing markers before adding new ones
-            map.eachLayer(function(layer) {
-                if (layer instanceof L.Marker) {
-                    map.removeLayer(layer);
-                }
-            });
-
-            // Add markers to the map
-            locations.forEach(location => {
-                if (location.latitude && location.longitude) {
-                    var marker = L.marker([location.latitude, location.longitude]).addTo(map);
-
-                    // Popup content with drop number input field, assign drop button, and delete record button
-                    var popupContent = `
-                    <div class="popup-content">
-                        <strong>Address:</strong><br>
-                        <span>${location.street_number} ${location.street_name}</span><br>
-                        <span>${location.suburb}, ${location.city}</span><br><br>
-                        
-                        <div class="form-group">
-                            <label for="dropNumber${location.delivery_id}">Drop Number:</label>
-                            <input type="number" class="form-control" id="dropNumber${location.delivery_id}" value="${location.drop_number || ''}" />
-                        </div>
-                        
-                        <div class="d-flex justify-content-between">
-                            <button class="btn btn-success" onclick="assignDrop('${location.delivery_id}')">Assign Drop</button>
-                            <button class="btn btn-danger" onclick="deleteRecord('${location.delivery_id}')">Delete Record</button>
-                        </div>
-                    </div>
-                `;
-                    marker.bindPopup(popupContent).openPopup();
-
-                    // Show drop number on the marker if assigned
-                    if (location.drop_number) {
-                        var dropLabel = `${location.drop_number}`;
-                        var dropIcon = L.divIcon({
-                            className: 'drop-icon',
-                            html: `<div style="color: red; font-size: 20px; font-weight: bold; text-align: center;">
-                            ${dropLabel}
-                        </div>`,
-                            iconSize: [30, 42],
-                            popupAnchor: [0, -30]
-                        });
-                        marker.setIcon(dropIcon);
-                    }
-                } else {
-                    console.error('Location missing coordinates:', location);
-                }
-            });
-        })
-        .catch(err => console.error('Error fetching locations:', err));
-}
-
 
 // Function to assign a drop number
 function assignDrop(deliveryId) {
@@ -256,6 +247,7 @@ function deleteRecord(deliveryId) {
         .catch(err => console.error('Error deleting record:', err));
     }
 }
+
 
 // Update the file input label on file selection
 document.getElementById('customFile').addEventListener('change', function(event) {
