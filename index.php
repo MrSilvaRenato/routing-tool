@@ -36,32 +36,28 @@
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        
-
+<div class="container">
+    <!-- Controls container with Upload and Buttons -->
     <div id="controls" class="d-flex justify-content-center my-3">
-    <!-- Flex container for form and buttons -->
-    <div class="d-flex align-items-center">
-        <!-- Upload form -->
-        <form id="uploadForm" enctype="multipart/form-data" class="form-inline">
-            <div class="custom-file mb-2 mr-2">
-                <input type="file" name="spreadsheet" accept=".xlsx, .xls, .csv" required class="custom-file-input" id="customFile">
-                <label class="custom-file-label" for="customFile">Upload Manifest</label>
-            </div>
-            <button type="submit" class="btn btn-primary mb-2">Upload</button>
-        </form>
-           
+        <div class="d-flex align-items-center">
+            <!-- Upload form -->
+            <form id="uploadForm" enctype="multipart/form-data" class="form-inline">
+                <div class="custom-file mb-2 mr-2">
+                    <input type="file" name="spreadsheet" accept=".xlsx, .xls, .csv" required class="custom-file-input" id="customFile">
+                    <label class="custom-file-label" for="customFile">Upload Manifest</label>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Upload</button>
+            </form>
+
+            <!-- Buttons outside the form but still aligned -->
+            <button type="button" id="deleteAllBtn" class="btn btn-danger mb-2 ml-2" onclick="deleteAllRecords()">Delete All</button>
+            <button type="button" id="optimizeDropsBtn" class="btn btn-success mb-2 ml-2" onclick="optimizeDrops()">Optimize Drops</button>
         </div>
-
-        <div id="loadingMessage" class="alert alert-info" style="display:none;">
-            Manifest is getting uploaded, please wait<span id="loadingDots">...</span>
-        </div>
-
-        <div id="message" class="my-3"></div>
-
-        <h2 class="text-center">Delivery Map</h2>
-        <div id="map"></div>
     </div>
+
+    <!-- Map container with proper sizing -->
+    <div id="map" class="w-100" style="height: 600px;"></div>
+</div>
 <footer><p class="text-center">Basic Routing Tool by Renato</p></footer>
     <script src="js.js"></script>
 </body>
