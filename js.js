@@ -154,8 +154,8 @@ function setupSelectionFeature() {
         if (e.originalEvent.button === 2) { // Right mouse button
             e.originalEvent.preventDefault(); // Prevent context menu from appearing
             startPoint = e.latlng; // Get starting point
-            selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 });
-            map.addLayer(selectionBox);
+            selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 }).addTo(map);
+            selectionBox.bringToFront(); // Ensure the selection box is on top
             isSelecting = true; // Set selection mode
             map.dragging.disable(); // Disable map dragging while selecting
         }
