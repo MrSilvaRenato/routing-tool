@@ -64,11 +64,10 @@
 .google-maps-icon {
     content: "";
             position: absolute;
-            width: 100px;
-            height: 100px;
+            width: 30px !important;
+            height: 30px !important;
             background-color: #4285F4;
             border-radius: 50%;
-            display: flex;
             align-items: center;
             justify-content: center;
         }
@@ -76,8 +75,8 @@
         .google-maps-icon::after {
             content: '';
             position: relative;
-            width: 30px;
-            height: 30px;
+            width: 15px !important;
+            height: 15px !important;
             background-color: #34A853;
             border-radius: 50%;
         }
