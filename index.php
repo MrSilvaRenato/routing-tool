@@ -79,6 +79,7 @@
             border-radius: 50%;
         }
         .google-maps-icon::after {
+            content: '';
             position: absolute;
             width: 30px;
             height: 30px;
@@ -90,7 +91,7 @@
 </head>
 <body>
 <div class="container">
-    <div class="google-maps-icon"></div>
+    <div>HARDICK BUM FACE</div>
     <!-- Controls container with Upload and Buttons -->
     <div id="controls" class="d-flex justify-content-center my-3">
         <div class="d-flex align-items-center">
