@@ -186,7 +186,7 @@ map.on('mouseup', function (e) {
 // });
 
 // Function to highlight selected markers
-function highlightSelectedMarkers(selectedMarkers) {
+
     selectedMarkers.forEach(marker => {
       // Change the icon to a highlighted version when selected
       marker.setIcon(new L.Icon({
@@ -196,7 +196,7 @@ function highlightSelectedMarkers(selectedMarkers) {
           popupAnchor: [0, -35]  // Position the popup above the marker
       }));
     });
-  }
+  
 
         // Remove the selection box after selection
         map.removeLayer(selectionBox);
