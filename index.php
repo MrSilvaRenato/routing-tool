@@ -62,6 +62,7 @@
 }
 
 .google-maps-icon {
+    content: "";
             position: absolute;
             width: 100px;
             height: 100px;
