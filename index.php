@@ -61,44 +61,38 @@
     }
 }
 
-.map-pin {
-  width: 30px; /* Width of the pin */
-  height: 40px; /* Height of the pin */
-  background-color: red; /* Main color of the pin */
-  position: relative;
-  border-radius: 15px 15px 0 0; /* Rounded top */
-  margin: 0 auto; /* Center the pin */
-}
-
-.map-pin::after {
-  content: '';
-  position: absolute;
-  bottom: -15px; /* Positioning the bottom part */
-  left: 50%;
-  margin-left: -10px; /* Center the bottom part */
-  width: 20px; /* Width of the bottom point */
-  height: 20px; /* Height of the bottom point */
-  background-color: red; /* Same color as the top part */
-  border-radius: 50%; /* Round bottom */
-  transform: translateY(0) rotate(45deg); /* Sharp bottom point */
-}
-
-.map-pin:before {
-  content: '';
-  position: absolute;
-  top: 10px; /* Adjust this to position the inner circle */
-  left: 50%;
-  margin-left: -10px; /* Center the inner circle */
-  width: 20px; /* Width of the inner circle */
-  height: 20px; /* Height of the inner circle */
-  background-color: white; /* Inner circle color */
-  border-radius: 50%; /* Make it round */
-  z-index: 1; /* Bring the inner circle above the pin */
-}
+.google-maps-icon {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background-color: #4285F4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .google-maps-icon::before {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+        }
+        .google-maps-icon::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #34A853;
+            border-radius: 50%;
+            top: 35px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
+    <div class="google-maps-icon"></div>
     <!-- Controls container with Upload and Buttons -->
     <div id="controls" class="d-flex justify-content-center my-3">
         <div class="d-flex align-items-center">
