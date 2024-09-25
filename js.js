@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(loadMapMarkers, 30000);
 
     // Set up map event listeners for selection feature
-    setupSelectionFeature();
 });
 
 // Function to load map markers
