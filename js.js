@@ -177,13 +177,26 @@ map.on('mouseup', function (e) {
         selectedMarkers = markers.filter(marker => bounds.contains(marker.getLatLng()));
 
 // Highlight selected markers
-selectedMarkers.forEach(marker => {
-    marker.setIcon(L.divIcon({
-        className: 'google-maps-icon',  // Apply the CSS class for custom styling
-        iconSize: [15, 30],  // Adjust size as needed
-        iconAnchor: [15, 30],  // Anchor the icon at the bottom center
-    }));
-});
+// selectedMarkers.forEach(marker => {
+//     marker.setIcon(L.divIcon({
+//         className: 'google-maps-icon',  // Apply the CSS class for custom styling
+//         iconSize: [15, 30],  // Adjust size as needed
+//         iconAnchor: [15, 30],  // Anchor the icon at the bottom center
+//     }));
+// });
+
+// Function to highlight selected markers
+function highlightSelectedMarkers(selectedMarkers) {
+    selectedMarkers.forEach(marker => {
+      // Change the icon to a highlighted version when selected
+      marker.setIcon(new L.Icon({
+          iconUrl: 'marker-icon.png',  // Path to your red location pin
+          iconSize: [20, 35],  // Adjust size if needed
+          iconAnchor: [10, 35],  // Adjust anchor point if needed
+          popupAnchor: [0, -35]  // Position the popup above the marker
+      }));
+    });
+  }
 
         // Remove the selection box after selection
         map.removeLayer(selectionBox);

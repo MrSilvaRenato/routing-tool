@@ -61,13 +61,13 @@
     }
 }
 
-.google-maps-icon {
+/* .google-maps-icon {
     content: "";
             position: absolute;
             width: 30px !important;
             height: 30px !important;
             background-color: #4285F4;
-            border-radius: 50%;
+            border-radius: 50%; 
             align-items: center;
             justify-content: center;
         }
@@ -79,7 +79,7 @@
             height: 15px !important;
             background-color: #34A853;
             border-radius: 50%;
-        }
+        } */
     </style>
 </head>
 <body>
