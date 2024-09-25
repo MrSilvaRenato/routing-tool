@@ -71,21 +71,14 @@
             align-items: center;
             justify-content: center;
         }
-        .google-maps-icon::before {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background-color: white;
-            border-radius: 50%;
-        }
+       
         .google-maps-icon::after {
             content: '';
-            position: absolute;
+            position: relative;
             width: 30px;
             height: 30px;
             background-color: #34A853;
             border-radius: 50%;
-            top: 10px;
         }
     </style>
 </head>
