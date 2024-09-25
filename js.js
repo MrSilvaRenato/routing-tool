@@ -10,6 +10,9 @@ let selectionBox; // Variable for selection box
 let startPoint; // Starting point for the selection
 let isSelecting = false; // Track whether selection is in progress
 let markers = []; // Array to store markers
+let selectedMarkers = [];  // Array to store selected markers
+
+
 
 // Load map markers when DOM content is loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -147,7 +150,47 @@ function uploadSpreadsheet() {
     });
 }
 
-// Function to set up selection feature on the map
+// Right-click to start selection box
+map.on('mousedown', function (e) {
+    if (e.originalEvent.button === 2) {  // Right-click
+        startPoint = e.latlng;  // Record starting point of the box
+        selectionBox = L.rectangle([startPoint, startPoint], { color: 'blue', weight: 1 }).addTo(map);
+        map.on('mousemove', resizeSelectionBox);  // Track the mouse movement to resize the box
+    }
+});
+
+
+// Resize the selection box as the mouse moves
+function resizeSelectionBox(e) {
+    endPoint = e.latlng;
+    selectionBox.setBounds([startPoint, endPoint]);
+}
+
+// Right-click release to select markers within the box
+map.on('mouseup', function (e) {
+    if (e.originalEvent.button === 2 && selectionBox) {  // Right-click release
+        map.off('mousemove', resizeSelectionBox);  // Stop resizing the box
+
+        // Get bounds of the selection box
+        let bounds = selectionBox.getBounds();
+
+        // Highlight markers within the selection box
+        selectedMarkers = markers.filter(marker => bounds.contains(marker.getLatLng()));
+
+        // Highlight selected markers
+        selectedMarkers.forEach(marker => {
+            marker.setIcon(new L.Icon({
+                iconUrl: 'path-to-highlighted-icon.png',  // Replace with your highlighted icon path
+                iconSize: [25, 41],  // Adjust size if needed
+            }));
+        });
+
+        // Remove the selection box after selection
+        map.removeLayer(selectionBox);
+        selectionBox = null;
+    }
+});
+
 // Create default and selected icon for markers
 const defaultIcon = L.divIcon({
     className: 'marker-icon',
