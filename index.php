@@ -91,7 +91,7 @@
 </head>
 <body>
 <div class="container">
-    <div>HARDICK BUM FACE</div>
+    <div style="weight:800;" style="color:red;" >HARDICK BUM FACE</div>
     <!-- Controls container with Upload and Buttons -->
     <div id="controls" class="d-flex justify-content-center my-3">
         <div class="d-flex align-items-center">
