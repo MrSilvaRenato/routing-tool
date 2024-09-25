@@ -179,9 +179,9 @@ map.on('mouseup', function (e) {
 // Highlight selected markers
 selectedMarkers.forEach(marker => {
     marker.setIcon(L.divIcon({
-        className: 'map-pin',  // Apply the CSS class for custom styling
-        iconSize: [30, 50],  // Adjust size as needed
-        iconAnchor: [15, 50],  // Anchor the icon at the bottom center
+        className: '.google-maps-icon',  // Apply the CSS class for custom styling
+        iconSize: [15, 30],  // Adjust size as needed
+        iconAnchor: [15, 30],  // Anchor the icon at the bottom center
     }));
 });
 
