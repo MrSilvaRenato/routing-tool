@@ -61,24 +61,40 @@
     }
 }
 
-.custom-pin {
+.custom-marker {
     background-color: red;  /* Pin color */
     width: 30px;  /* Pin width */
     height: 50px;  /* Pin height */
-    border-radius: 30px 30px 0 0;  /* Rounded top */
-    position: relative;  /* For positioning the circle */
-    margin-top: -10px;  /* Adjust positioning */
+    position: relative;  /* Positioning for pseudo-elements */
+    border-radius: 15px 15px 0 0;  /* Rounded top */
+    /* To create the sharp bottom part */
 }
 
-.custom-pin::after {
-    content: '';  /* Create the white circle */
+.custom-marker:after {
+    content: '';  /* Creates the triangle shape */
+    position: absolute;
+    bottom: -15px;  /* Adjust based on the size */
+    left: 50%;
+    margin-left: -10px;  /* Half the width of the triangle */
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;  /* Left side */
+    border-right: 10px solid transparent;  /* Right side */
+    border-top: 15px solid red;  /* Bottom triangle color */
+}
+
+/* Inner white circle */
+.custom-marker:before {
+    content: '';
+    position: absolute;
+    top: 10px;  /* Adjust based on the size */
+    left: 50%;
+    margin-left: -10px;  /* Center the circle */
+    width: 20px;  /* Circle size */
+    height: 20px;  /* Circle size */
+    border-radius: 50%;  /* Make it circular */
     background-color: white;  /* Circle color */
-    border-radius: 50%;  /* Make it a circle */
-    width: 15px;  /* Circle diameter */
-    height: 15px;  /* Circle diameter */
-    position: absolute;  /* Positioning */
-    top: 10px;  /* Position from top */
-    left: 7.5px;  /* Center the circle */
+    border: 2px solid red;  /* Optional: border color */
 }
     </style>
 </head>
