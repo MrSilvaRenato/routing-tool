@@ -85,7 +85,7 @@
             height: 30px;
             background-color: #34A853;
             border-radius: 50%;
-            top: 35px;
+            top: 10px;
         }
     </style>
 </head>
