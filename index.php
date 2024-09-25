@@ -62,7 +62,7 @@
 }
 
 .google-maps-icon {
-            position: relative;
+            position: absolute;
             width: 100px;
             height: 100px;
             background-color: #4285F4;
