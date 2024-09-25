@@ -62,9 +62,9 @@
 }
 
 .map-pin {
-  width: 30px; /* Adjust width */
-  height: 50px; /* Adjust height */
-  background-color: red; /* Pin color */
+  width: 30px; /* Width of the pin */
+  height: 40px; /* Height of the pin */
+  background-color: red; /* Main color of the pin */
   position: relative;
   border-radius: 15px 15px 0 0; /* Rounded top */
   margin: 0 auto; /* Center the pin */
@@ -73,14 +73,27 @@
 .map-pin::after {
   content: '';
   position: absolute;
-  bottom: -10px; /* Distance from the top part */
+  bottom: -15px; /* Positioning the bottom part */
   left: 50%;
   margin-left: -10px; /* Center the bottom part */
   width: 20px; /* Width of the bottom point */
   height: 20px; /* Height of the bottom point */
   background-color: red; /* Same color as the top part */
   border-radius: 50%; /* Round bottom */
-  transform: translateY(50%) rotate(45deg); /* Create a sharp point */
+  transform: translateY(0) rotate(45deg); /* Sharp bottom point */
+}
+
+.map-pin:before {
+  content: '';
+  position: absolute;
+  top: 10px; /* Adjust this to position the inner circle */
+  left: 50%;
+  margin-left: -10px; /* Center the inner circle */
+  width: 20px; /* Width of the inner circle */
+  height: 20px; /* Height of the inner circle */
+  background-color: white; /* Inner circle color */
+  border-radius: 50%; /* Make it round */
+  z-index: 1; /* Bring the inner circle above the pin */
 }
     </style>
 </head>
