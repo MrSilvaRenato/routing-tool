@@ -61,45 +61,27 @@
     }
 }
 
-.custom-marker {
-    background-color: red;  /* Pin color */
-    width: 30px;  /* Pin width */
-    height: 40px;  /* Pin height */
-    position: relative;  /* Positioning for pseudo-elements */
-    border-radius: 15px 15px 0 0;  /* Rounded top */
-    /* To create the sharp bottom part */
-    margin-bottom: -15px;  /* Adjust the overlap */
+.map-pin {
+  width: 30px; /* Adjust width */
+  height: 50px; /* Adjust height */
+  background-color: red; /* Pin color */
+  position: relative;
+  border-radius: 15px 15px 0 0; /* Rounded top */
+  margin: 0 auto; /* Center the pin */
 }
 
-.custom-marker:after {
-    content: '';  /* Creates the triangle shape */
-    position: absolute;
-    bottom: 0;  /* Position at the bottom */
-    left: 50%;
-    margin-left: -8px;  /* Half the width of the triangle */
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;  /* Left side */
-    border-right: 8px solid transparent;  /* Right side */
-    border-top: 15px solid red;  /* Bottom triangle color */
+.map-pin::after {
+  content: '';
+  position: absolute;
+  bottom: -10px; /* Distance from the top part */
+  left: 50%;
+  margin-left: -10px; /* Center the bottom part */
+  width: 20px; /* Width of the bottom point */
+  height: 20px; /* Height of the bottom point */
+  background-color: red; /* Same color as the top part */
+  border-radius: 50%; /* Round bottom */
+  transform: translateY(50%) rotate(45deg); /* Create a sharp point */
 }
-
-/* Inner white circle */
-.custom-marker:before {
-    content: '';
-    position: absolute;
-    top: 10px;  /* Adjust based on the size */
-    left: 50%;
-    margin-left: -10px;  /* Center the circle */
-    width: 20px;  /* Circle size */
-    height: 20px;  /* Circle size */
-    border-radius: 50%;  /* Make it circular */
-    background-color: white;  /* Circle color */
-    border: 2px solid red;  /* Optional: border color */
-    z-index: 1;  /* Ensure the circle is above the pin */
-}
-
-
     </style>
 </head>
 <body>

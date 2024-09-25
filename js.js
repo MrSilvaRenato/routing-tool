@@ -179,7 +179,7 @@ map.on('mouseup', function (e) {
 // Highlight selected markers
 selectedMarkers.forEach(marker => {
     marker.setIcon(L.divIcon({
-        className: 'custom-marker',  // Apply the CSS class for custom styling
+        className: 'map-pin',  // Apply the CSS class for custom styling
         iconSize: [30, 50],  // Adjust size as needed
         iconAnchor: [15, 50],  // Anchor the icon at the bottom center
     }));
