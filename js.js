@@ -65,8 +65,8 @@ map.on('mouseup', function (e) {
         // Highlight selected markers
         selectedMarkers.forEach(marker => {
             marker.setIcon(new L.Icon({
-                iconUrl: 'path-to-highlighted-icon.png',  // Replace with your highlighted icon path
-                iconSize: [25, 41],  // Adjust size if needed
+                iconUrl: 'marker.png',  // Path to the image in the root
+                iconSize: [25, 41],     // Adjust size if needed
             }));
         });
 
