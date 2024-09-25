@@ -179,7 +179,7 @@ map.on('mouseup', function (e) {
 // Highlight selected markers
 selectedMarkers.forEach(marker => {
     marker.setIcon(L.divIcon({
-        className: '.google-maps-icon',  // Apply the CSS class for custom styling
+        className: 'google-maps-icon',  // Apply the CSS class for custom styling
         iconSize: [15, 30],  // Adjust size as needed
         iconAnchor: [15, 30],  // Anchor the icon at the bottom center
     }));
