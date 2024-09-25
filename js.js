@@ -176,11 +176,12 @@ map.on('mouseup', function (e) {
         // Highlight markers within the selection box
         selectedMarkers = markers.filter(marker => bounds.contains(marker.getLatLng()));
 
-  // Highlight selected markers
+// Highlight selected markers
 selectedMarkers.forEach(marker => {
-    marker.setIcon(new L.DivIcon({
-        className: 'custom-pin',  // Use custom CSS class
-        iconSize: [30, 50],  // Adjust size if needed
+    marker.setIcon(L.divIcon({
+        className: 'custom-marker',  // Apply the CSS class for custom styling
+        iconSize: [30, 50],  // Adjust size as needed
+        iconAnchor: [15, 50],  // Anchor the icon at the bottom center
     }));
 });
 
