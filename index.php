@@ -72,7 +72,6 @@
             justify-content: center;
         }
         .google-maps-icon::before {
-            content: '';
             position: absolute;
             width: 60px;
             height: 60px;
@@ -80,7 +79,6 @@
             border-radius: 50%;
         }
         .google-maps-icon::after {
-            content: '';
             position: absolute;
             width: 30px;
             height: 30px;
