@@ -60,7 +60,26 @@
         margin-top: 10px; /* Add some top margin */
     }
 }
-</style>
+
+.custom-pin {
+    background-color: red;  /* Pin color */
+    width: 30px;  /* Pin width */
+    height: 50px;  /* Pin height */
+    border-radius: 30px 30px 0 0;  /* Rounded top */
+    position: relative;  /* For positioning the circle */
+    margin-top: -10px;  /* Adjust positioning */
+}
+
+.custom-pin::after {
+    content: '';  /* Create the white circle */
+    background-color: white;  /* Circle color */
+    border-radius: 50%;  /* Make it a circle */
+    width: 15px;  /* Circle diameter */
+    height: 15px;  /* Circle diameter */
+    position: absolute;  /* Positioning */
+    top: 10px;  /* Position from top */
+    left: 7.5px;  /* Center the circle */
+}
     </style>
 </head>
 <body>

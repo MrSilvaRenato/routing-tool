@@ -177,13 +177,13 @@ map.on('mouseup', function (e) {
         // Highlight markers within the selection box
         selectedMarkers = markers.filter(marker => bounds.contains(marker.getLatLng()));
 
-        // Highlight selected markers
-        selectedMarkers.forEach(marker => {
-            marker.setIcon(new L.Icon({
-                iconUrl: 'marker.png',  // Replace with your highlighted icon path
-                iconSize: [25, 41],  // Adjust size if needed
-            }));
-        });
+  // Highlight selected markers
+selectedMarkers.forEach(marker => {
+    marker.setIcon(new L.DivIcon({
+        className: 'custom-pin',  // Use custom CSS class
+        iconSize: [30, 50],  // Adjust size if needed
+    }));
+});
 
         // Remove the selection box after selection
         map.removeLayer(selectionBox);
@@ -191,83 +191,7 @@ map.on('mouseup', function (e) {
     }
 });
 
-// Create default and selected icon for markers
-const defaultIcon = L.divIcon({
-    className: 'marker-icon',
-    html: `<div style="color: blue; font-size: 20px; font-weight: bold; text-align: center;">Normal</div>`,
-    iconSize: [30, 42],
-    popupAnchor: [0, -30]
-});
 
-const selectedIcon = L.divIcon({
-    className: 'marker-icon',
-    html: `<div style="color: red; font-size: 20px; font-weight: bold; text-align: center;">Selected</div>`,
-    iconSize: [30, 42],
-    popupAnchor: [0, -30]
-});
-
-// Function to set up selection feature on the map
-function setupSelectionFeature() {
-    // Mouse down event
-    map.on('mousedown', function(e) {
-        if (e.originalEvent.button === 2) { // Right mouse button
-            e.originalEvent.preventDefault(); // Prevent context menu from appearing
-            startPoint = e.latlng; // Get starting point
-            selectionBox = L.rectangle([startPoint, startPoint], { color: "#ff0000", weight: 1 }).addTo(map);
-            selectionBox.bringToFront(); // Ensure the selection box is on top
-            isSelecting = true; // Set selection mode
-            map.dragging.disable(); // Disable map dragging while selecting
-        }
-    });
-
-    // Mouse move event
-    map.on('mousemove', function(e) {
-        if (isSelecting && selectionBox) {
-            const bounds = L.latLngBounds(startPoint, e.latlng);
-            selectionBox.setBounds(bounds); // Update selection box bounds
-        }
-    });
-
-    // Mouse up event
-    map.on('mouseup', function(e) {
-        if (isSelecting && selectionBox && e.originalEvent.button === 2) { // Right mouse button
-            map.removeLayer(selectionBox);
-            selectionBox = null; // Clear selection box
-            isSelecting = false; // Reset selection mode
-            map.dragging.enable(); // Re-enable map dragging
-            
-            // Highlight selected markers
-            highlightSelectedMarkers();
-        }
-    });
-
-    // Context menu event to disable right-click context menu
-    map.on('contextmenu', function(e) {
-        e.originalEvent.preventDefault(); // Prevent default context menu
-    });
-}
-
-// Function to highlight selected markers
-function highlightSelectedMarkers() {
-    const bounds = selectionBox ? selectionBox.getBounds() : null; // Get the bounds of the selection box
-
-    if (bounds) {
-        console.log("Selection Bounds: ", bounds); // Debug: Log selection bounds
-        markers.forEach(marker => {
-            console.log("Marker Position: ", marker.getLatLng()); // Debug: Log marker positions
-
-            // Check if the marker is within the bounds
-            if (bounds.contains(marker.getLatLng())) {
-                console.log("Marker Selected: ", marker.getLatLng()); // Debug: Log selected marker
-                // Change the icon to indicate selection
-                marker.setIcon(selectedIcon);
-            } else {
-                // Reset the icon for markers outside the selection
-                marker.setIcon(defaultIcon);
-            }
-        });
-    }
-}
 
 // Function to animate loading dots
 function animateLoadingDots() {
